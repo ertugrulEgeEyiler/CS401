@@ -1,28 +1,43 @@
-import java.lang.reflect.Array;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Random;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
     public static void main(String[] args) {
-
-        System.out.println("Hello and welcome!");
-        ArrayList<Integer> toCluster = generateArray();
-        cluster(toCluster);
+        String[] newArray = generateRandomWords();
+        cluster(newArray);
     }
 
-    public static ArrayList<Integer> generateArray(){
-        Random random = new Random(1);
-        ArrayList<Integer> array = new ArrayList<Integer>(100);
-        for (int i = 0; i < 100; i++){
-            int number = random.nextInt(2);
-            array.add(i,number);
+    public static String[] generateRandomWords() {
+        String[] randomStrings = new String[100];
+        Random random = new Random();
+        for (int i = 0; i < 100; i++) {
+            char[] word = new char[random.nextInt(8) + 3]; // words of length 3 through 10. (1 and 2 letter words are boring.)
+            for (int j = 0; j < word.length; j++) {
+                word[j] = (char) ('a' + random.nextInt(26));
+            }
+            randomStrings[i] = new String(word);
+        }
+        return randomStrings;
+    }
+    public static void cluster(String[] toCluster) {
+        ArrayList<String> letA = new ArrayList<>();
+
+        for (String word : toCluster) {
+            boolean found = false;
+            for (char letter : word.toCharArray()) {
+                if (letter == 'a') {
+                    letA.add(word);
+                    found = true;
+                    break;
+                }
+
+            }
         }
 
-        return array;
-    }
-
-    public static void cluster(ArrayList<Integer> toCluster){
-
+        for (String s : letA) {
+            if (s != null) {
+                System.out.println(s);
+            }
+        }
     }
 }

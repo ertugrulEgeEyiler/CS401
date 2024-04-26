@@ -23,7 +23,7 @@ public class KModeClusterer {
         boolean changed;
         do {
             changed = assignToClusters(imports);
-            recalculateModes();
+            recalculateModes(imports);
         } while (changed);
 
         writeClusters(outputFile);
@@ -43,7 +43,18 @@ public class KModeClusterer {
     }
 
     private void initializeModes(List<String> imports) {
-        for (int i = 0; i < numClusters; i++) {
+        Collections.shuffle(imports);
+        Set<String> chosenPackages = new HashSet<>();
+        for (String imp : imports) {
+            String packageName = imp.substring(0, imp.lastIndexOf('.'));
+            if (!chosenPackages.contains(packageName) && modes.size() < numClusters) {
+                modes.add(imp);
+                clusters.add(new HashSet<>());
+                chosenPackages.add(packageName);
+            }
+        }
+        // Ensure all clusters have an initial mode if there were not enough packages
+        while (modes.size() < numClusters) {
             int randomIndex = random.nextInt(imports.size());
             modes.add(imports.get(randomIndex));
             clusters.add(new HashSet<>());
@@ -77,17 +88,39 @@ public class KModeClusterer {
     }
 
     private int calculateDistance(String imp, String mode) {
-        return imp.equals(mode) ? 0 : 1;
+        // Example: use the number of shared path components as a basis for similarity
+        String[] impComponents = imp.split("\\.");
+        String[] modeComponents = mode.split("\\.");
+        int maxLength = Math.max(impComponents.length, modeComponents.length);
+        int commonLength = 0;
+        for (int i = 0; i < Math.min(impComponents.length, modeComponents.length); i++) {
+            if (impComponents[i].equals(modeComponents[i])) {
+                commonLength++;
+            } else {
+                break;
+            }
+        }
+        return maxLength - commonLength; // Lower scores for more similar strings
     }
 
-    private void recalculateModes() {
+    private void recalculateModes(List<String> imports) {
         for (int i = 0; i < clusters.size(); i++) {
+            System.out.println("Recalculating mode for cluster " + i + ", size: " + clusters.get(i).size());
             Map<String, Integer> frequency = new HashMap<>();
-            clusters.get(i).forEach(imp -> frequency.put(imp, frequency.getOrDefault(imp, 0) + 1));
-            String newMode = Collections.max(frequency.entrySet(), Map.Entry.comparingByValue()).getKey();
-            modes.set(i, newMode);
+            for (String imp : clusters.get(i)) {
+                frequency.put(imp, frequency.getOrDefault(imp, 0) + 1);
+            }
+            if (!frequency.isEmpty()) {
+                String newMode = Collections.max(frequency.entrySet(), Map.Entry.comparingByValue()).getKey();
+                modes.set(i, newMode);
+            } else if (!imports.isEmpty()) {
+                // Fallback to prevent empty clusters
+                modes.set(i, imports.get(random.nextInt(imports.size())));
+            }
         }
     }
+
+
 
     private void writeClusters(String outputFile) throws IOException {
         try (PrintWriter writer = new PrintWriter(new FileWriter(outputFile))) {

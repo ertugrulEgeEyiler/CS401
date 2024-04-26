@@ -2,7 +2,7 @@ import Clusterer.ImportClusterer;
 import Clusterer.KModeClusterer;
 import Parser.ImportFinder;
 import Test.Test;
-
+import Clusterer.GeneticAlgorithm;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -13,6 +13,8 @@ public class Main {
     public static void main(String[] args) throws IOException {
         ImportFinder importFinder = new ImportFinder();
         ImportClusterer importClusterer = new ImportClusterer();
+        KModeClusterer kModesClusterer = new KModeClusterer(5);
+        GeneticAlgorithm gaClusterer = new GeneticAlgorithm(10, 5, 50, 0.05);
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("Please enter the directory of your project.");
@@ -58,10 +60,13 @@ public class Main {
         System.out.println("Clustering complete, results saved to: " + clusteredFile);
 
         // K-Modes clustering
-        KModeClusterer kModesClusterer = new KModeClusterer(3);  // Number of clusters can be adjusted
         String kModesOutputFile = desktopPath + File.separator + "kModesClustered.txt";
         kModesClusterer.executeClustering(outputFile, kModesOutputFile);
         System.out.println("K-Modes Clustering complete, results saved to: " + kModesOutputFile);
+        String gaAlgorithmClusterFile = desktopPath + File.separator + "gaAlgorithmClustered.txt";
+        gaClusterer.findClusters(outputFile, gaAlgorithmClusterFile);
+        System.out.println("Genetic Algorithm Clustering complete, results saved to: " + gaAlgorithmClusterFile);
+
     }
 
     public void test() {

@@ -44,7 +44,7 @@ public class ImportFinder {
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                if (line.trim().startsWith("import")) {
+                if (line.trim().startsWith("import ")) {
                     String importStatement = line.trim().replace("import", "").replace(";", "").trim();
                     imports.add(importStatement);
                 }

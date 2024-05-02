@@ -9,6 +9,12 @@ import java.util.Map;
 
 public abstract class Clustering {
 
+<<<<<<< Updated upstream
+=======
+
+    // Abstract method to be implemented by subclasses for finding and clustering imports
+    public abstract void findClusters(String inputFile, String outputFile) throws IOException;
+>>>>>>> Stashed changes
 
 
     public static void writeClusters(Map<Integer, StringBuilder> clusters, String outputFile) throws IOException {

@@ -1,28 +1,26 @@
 import Clusterer.ImportClusterer;
+import Clusterer.KModeClusterer;
 import Parser.ImportFinder;
 import Test.Test;
-
+import Clusterer.GeneticAlgorithm;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Scanner;
-import java.util.Set;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-
         ImportFinder importFinder = new ImportFinder();
         ImportClusterer importClusterer = new ImportClusterer();
+        KModeClusterer kModesClusterer = new KModeClusterer(5);
+        GeneticAlgorithm gaClusterer = new GeneticAlgorithm(10, 5, 50, 0.05);
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Please enter the directory of your project.");
-        String directory =  scanner.nextLine();
-        String outputFile = "C:\\Users\\zeroc\\Desktop\\java\\output.txt";
-        PrintWriter printWriter = new PrintWriter(outputFile);
-        String clusteredFile = directory + "\\clustered.txt";
 
-<<<<<<< Updated upstream
-=======
+        System.out.println("Please enter the directory of your project.");
+        String directory = scanner.nextLine();
+        File dir = new File(directory);
+
         if (!dir.exists()) {
             System.out.println("Directory does not exist: " + directory);
             return;
@@ -32,7 +30,6 @@ public class Main {
             System.out.println("This is not a directory: " + directory);
             return;
         }
-        
 
         System.out.println("Directory is valid and exists: " + directory);
         String desktopPath = System.getProperty("user.home") + File.separator + "Desktop";
@@ -54,16 +51,25 @@ public class Main {
         }
 
         // Process import files
->>>>>>> Stashed changes
         importFinder.createImports(directory, printWriter);
+        printWriter.close();
+
+        // Import clustering
+        String clusteredFile = desktopPath + File.separator + "clustered.txt";
         importClusterer.findClusters(outputFile, clusteredFile);
+        System.out.println("Clustering complete, results saved to: " + clusteredFile);
+
+        // K-Modes clustering
+        String kModesOutputFile = desktopPath + File.separator + "kModesClustered.txt";
+        kModesClusterer.executeClustering(outputFile, kModesOutputFile);
+        System.out.println("K-Modes Clustering complete, results saved to: " + kModesOutputFile);
+        String gaAlgorithmClusterFile = desktopPath + File.separator + "gaAlgorithmClustered.txt";
+        gaClusterer.findClusters(outputFile, gaAlgorithmClusterFile);
+        System.out.println("Genetic Algorithm Clustering complete, results saved to: " + gaAlgorithmClusterFile);
 
     }
 
     public void test() {
-
-        Test Test = new Test();
-
+        Test test = new Test();
     }
-
 }

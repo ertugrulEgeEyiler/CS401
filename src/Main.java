@@ -1,4 +1,5 @@
 import Clusterer.ImportClusterer;
+import Clusterer.ImportRelationshipAnalyzer;
 import Clusterer.KModeClusterer;
 import Parser.ImportFinder;
 import Test.Test;
@@ -63,11 +64,21 @@ public class Main {
         String kModesOutputFile = desktopPath + File.separator + "kModesClustered.txt";
         kModesClusterer.executeClustering(outputFile, kModesOutputFile);
         System.out.println("K-Modes Clustering complete, results saved to: " + kModesOutputFile);
+
+        // Genetic Algorithm Clustering
         String gaAlgorithmClusterFile = desktopPath + File.separator + "gaAlgorithmClustered.txt";
         gaClusterer.findClusters(outputFile, gaAlgorithmClusterFile);
         System.out.println("Genetic Algorithm Clustering complete, results saved to: " + gaAlgorithmClusterFile);
 
+        // Analyze import relationships
+        String relationshipOutputFile = desktopPath + File.separator + "mostUsedTogether.txt";
+        ImportRelationshipAnalyzer analyzer = new ImportRelationshipAnalyzer();
+        analyzer.readFile(outputFile);
+        analyzer.analyzeAndPrintClusters(relationshipOutputFile);
+        System.out.println("Import clustering completed, results saved to: " + relationshipOutputFile);
     }
+
+
 
     public void test() {
         Test test = new Test();

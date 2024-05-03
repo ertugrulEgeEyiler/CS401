@@ -45,7 +45,13 @@ public class ImportClusterer extends Clustering {
         for (Map.Entry<String, Integer> entry : imports.entrySet()) {
             String importItem = entry.getKey();
             int count = entry.getValue();
-            if (importItem.startsWith("java.")) {
+            if (importItem.startsWith("java.")||
+                    importItem.startsWith("Math.")||
+                    importItem.startsWith("com.sun")||
+                    importItem.startsWith("javax.")||
+                    importItem.startsWith("jdk.internal")||
+                    importItem.startsWith("META-INF.services.")||
+                    importItem.startsWith("sun.")) {
                 javaImports.append(importItem).append("\n");
             } else {
                 StringBuilder cluster = clusters.computeIfAbsent(count, k -> new StringBuilder());
@@ -82,11 +88,9 @@ public class ImportClusterer extends Clustering {
 
     private void formatImports(FileWriter writer, String imports) throws IOException {
         for (String line : imports.split("\n")) {
-            if (line.endsWith(" imports:")) {
-                // Extract the filename up to ".java"
-                line = line.substring(0, line.indexOf(".java") + ".java".length());
+            if (!line.endsWith(" imports:")) { // Sadece "imports:" ile bitmeyen satırları yazdır
+                writer.write("\t" + line + "\n");
             }
-            writer.write("\t" + line + "\n");
         }
     }
 }

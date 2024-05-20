@@ -51,13 +51,11 @@ import java.util.*;
                 writer.println("Threshold: " + threshold);
                 writer.println();
 
-                int clusterId = 1;
+                int clusterId = 0;
                 for (Set<String> cluster : clusters.values()) {
-                    writer.println("Cluster " + clusterId + ":");
                     for (String file : cluster) {
-                        writer.println("\t" + file);
+                        writer.println("contains " + clusterId + " " + file);
                     }
-                    writer.println();
                     clusterId++;
                 }
             } catch (IOException e) {

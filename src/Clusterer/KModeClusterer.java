@@ -126,11 +126,9 @@ public class KModeClusterer {
     private void writeClusters(String outputFile) throws IOException {
         try (PrintWriter writer = new PrintWriter(new FileWriter(outputFile))) {
             for (int i = 0; i < clusters.size(); i++) {
-                writer.println("Cluster " + (i + 1) + ":");
-                clusters.get(i).forEach(imp -> writer.println("\t" + imp));
+                int x = i;
+                clusters.get(i).forEach(imp -> writer.println("contains " + x + " " + imp));
             }
         }
     }
-
-
 }

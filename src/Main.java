@@ -33,8 +33,8 @@ public class Main {
         }
 
         System.out.println("Directory is valid and exists: " + directory);
-        String desktopPath = System.getProperty("user.home") + File.separator + "Desktop";
-        String outputFile = desktopPath + File.separator + "output.txt";
+        String testPath = directory + File.separator + "Test";
+        String outputFile = testPath + File.separator + "output.txt";
 
         File outputFileParent = new File(outputFile).getParentFile();
         if (!outputFileParent.exists()) {
@@ -55,30 +55,28 @@ public class Main {
         importFinder.createImports(directory, printWriter);
         printWriter.close();
 
-        // Import clustering
-        String clusteredFile = desktopPath + File.separator + "clustered.txt";
+        // Use the specified test directory for all output files
+        String clusteredFile = testPath + File.separator + "clustered.txt";
         importClusterer.findClusters(outputFile, clusteredFile);
         System.out.println("Clustering complete, results saved to: " + clusteredFile);
 
         // K-Modes clustering
-        String kModesOutputFile = desktopPath + File.separator + "kModesClustered.txt";
+        String kModesOutputFile = testPath + File.separator + "kModesOutput.txt";
         kModesClusterer.executeClustering(outputFile, kModesOutputFile);
         System.out.println("K-Modes Clustering complete, results saved to: " + kModesOutputFile);
 
         // Genetic Algorithm Clustering
-        String gaAlgorithmClusterFile = desktopPath + File.separator + "gaAlgorithmClustered.txt";
+        String gaAlgorithmClusterFile = testPath + File.separator + "gaAlgorithmCluster.txt";
         gaClusterer.findClusters(outputFile, gaAlgorithmClusterFile);
         System.out.println("Genetic Algorithm Clustering complete, results saved to: " + gaAlgorithmClusterFile);
 
         // Analyze import relationships
-        String relationshipOutputFile = desktopPath + File.separator + "mostUsedTogether.txt";
+        String relationshipOutputFile = testPath + File.separator + "relationshipOutput.txt";
         ImportRelationshipAnalyzer analyzer = new ImportRelationshipAnalyzer();
         analyzer.readFile(outputFile);
         analyzer.analyzeAndPrintClusters(relationshipOutputFile);
         System.out.println("Import clustering completed, results saved to: " + relationshipOutputFile);
     }
-
-
 
     public void test() {
         Test test = new Test();

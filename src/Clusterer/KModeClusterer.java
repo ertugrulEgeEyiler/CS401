@@ -127,7 +127,7 @@ public class KModeClusterer {
         try (PrintWriter writer = new PrintWriter(new FileWriter(outputFile))) {
             for (int i = 0; i < clusters.size(); i++) {
                 int x = i;
-                clusters.get(i).forEach(imp -> writer.println("contains " + x + " " + imp));
+                clusters.get(i).forEach(imp -> writer.println("contain " + x + " " + imp));
             }
         }
     }

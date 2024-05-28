@@ -88,7 +88,7 @@ public class ImportClusterer extends Clustering {
         int new_number = number -1;
         for (String line : imports.split("\n")) {
             if (!line.endsWith(" imports:")) {
-                writer.write("contains " + new_number + " "  + line + "\n");
+                writer.write("contain " + new_number + " "  + line + "\n");
             }
         }
     }

@@ -112,7 +112,7 @@ public class GeneticAlgorithm extends Clustering {
         for (Map.Entry<String, Integer> entry : clusterData.entrySet()) {
             int clusterId = entry.getValue();
             String importItem = entry.getKey();
-            outputFormat.computeIfAbsent(clusterId, k -> new StringBuilder()).append("contains ").append(clusterId).append(" ").append(importItem).append("\n");
+            outputFormat.computeIfAbsent(clusterId, k -> new StringBuilder()).append("contain ").append(clusterId).append(" ").append(importItem).append("\n");
         }
         return outputFormat;
     }
@@ -122,7 +122,6 @@ public class GeneticAlgorithm extends Clustering {
             for (Map.Entry<Integer, StringBuilder> entry : clusters.entrySet()) {
                 System.out.println(entry.getValue().toString());
                 writer.write(entry.getValue().toString());
-                writer.write(System.lineSeparator());
             }
         }
     }

@@ -48,13 +48,10 @@ import java.util.*;
             }
 
             try (PrintWriter writer = new PrintWriter(new FileWriter(outputFile))) {
-                writer.println("Threshold: " + threshold);
-                writer.println();
-
                 int clusterId = 0;
                 for (Set<String> cluster : clusters.values()) {
                     for (String file : cluster) {
-                        writer.println("contains " + clusterId + " " + file);
+                        writer.println("contain " + clusterId + " " + file);
                     }
                     clusterId++;
                 }

@@ -6,17 +6,12 @@ java -jar txt2rsf.jar gaAlgorithmCluster.txt gaAlgorithmCluster.rsf
 java -jar txt2rsf.jar kModesOutput.txt kModesOutput.rsf
 java -jar txt2rsf.jar relationshipOutput.txt relationshipOutput.rsf
 
-java -jar mojo.jar clustered.rsf %2 -fm
-java -jar mojo.jar gaAlgorithmCluster.rsf %2 -fm
-java -jar mojo.jar kModesOutput.rsf %2 -fm
-java -jar mojo.jar relationshipOutput.rsf %2 -fm
+java -jar mojo.jar clustered.rsf gaAlgorithmCluster.rsf -fm
+java -jar mojo.jar clustered.rsf kModesOutput.rsf -fm
+java -jar mojo.jar clustered.rsf relationshipOutput.rsf -fm
+java -jar mojo.jar relationshipOutput.rsf gaAlgorithmCluster.rsf -fm
+java -jar mojo.jar kModesOutput.rsf relationshipOutput.rsf -fm
 
-rem Remove temporary files
-del clustered.txt
-del gaAlgorithmCluster.txt
-del kModesOutput.txt
-del relationshipOutput.txt
-del clustered.rsf
-del gaAlgorithmCluster.rsf
-del kModesOutput.rsf
-del relationshipOutput.rsf
+rem Remove temporary file
+
+

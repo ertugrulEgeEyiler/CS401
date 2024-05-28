@@ -1,7 +1,6 @@
 package Clusterer;
 
 import java.io.*;
-import java.sql.Array;
 import java.util.*;
 
 public class GeneticAlgorithm extends Clustering {

@@ -20,6 +20,7 @@ public class Main {
 
         System.out.println("Please enter the directory of your project.");
         String directory = scanner.nextLine();
+        String currentDirectory = "C:\\Users\\zeroc\\Documents\\GitHub\\CS401";
         File dir = new File(directory);
 
         if (!dir.exists()) {
@@ -33,7 +34,7 @@ public class Main {
         }
 
         System.out.println("Directory is valid and exists: " + directory);
-        String testPath = directory + File.separator + "Test";
+        String testPath = currentDirectory + File.separator + "src" + File.separator + "Test";
         String outputFile = testPath + File.separator + "output.txt";
 
         File outputFileParent = new File(outputFile).getParentFile();
@@ -81,4 +82,5 @@ public class Main {
     public void test() {
         Test test = new Test();
     }
+
 }

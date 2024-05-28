@@ -12,6 +12,7 @@ import java.util.*;
         public void analyzeAndPrintClusters(String outputFile) {
             calculateThreshold();
             calculateMostUsedTogether(); // En çok birlikte kullanılanları hesapla
+            System.out.println(importUsage.size());
 
             Map<String, Set<String>> clusters = new HashMap<>();
             Set<String> remainingFiles = new HashSet<>(importUsage.keySet());

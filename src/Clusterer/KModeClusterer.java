@@ -10,6 +10,7 @@ public class KModeClusterer {
     private List<String> modes;
     private Random random;
 
+
     public KModeClusterer(int numClusters) {
         this.numClusters = numClusters;
         this.clusters = new ArrayList<>();
@@ -120,8 +121,6 @@ public class KModeClusterer {
             }
         }
     }
-
-
 
     private void writeClusters(String outputFile) throws IOException {
         try (PrintWriter writer = new PrintWriter(new FileWriter(outputFile))) {

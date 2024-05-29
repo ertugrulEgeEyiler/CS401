@@ -73,23 +73,22 @@ public class ImportClusterer extends Clustering {
             for (Map.Entry<Integer, StringBuilder> entry : clusters.entrySet()) {
                 if (entry.getKey() == -1) continue; // Skip java imports for now
                 StringBuilder imports = entry.getValue();
-                writer.write("Cluster " + clusterNumber + ":\n");
-                formatImports(writer, imports.toString());
+                formatImports(writer, imports.toString(), clusterNumber);
                 clusterNumber++;  // Increment the counter for the next cluster
             }
             // Now write java imports last
             if (clusters.containsKey(-1)) {
                 StringBuilder javaImports = clusters.get(-1);
-                writer.write("Cluster " + clusterNumber + ":\n");
-                formatImports(writer, javaImports.toString());
+                formatImports(writer, javaImports.toString(), clusterNumber);
             }
         }
     }
 
-    private void formatImports(FileWriter writer, String imports) throws IOException {
+    private void formatImports(FileWriter writer, String imports, int number) throws IOException {
+        int new_number = number -1;
         for (String line : imports.split("\n")) {
-            if (!line.endsWith(" imports:")) { // Sadece "imports:" ile bitmeyen satırları yazdır
-                writer.write("\t" + line + "\n");
+            if (!line.endsWith(" imports:")) {
+                writer.write("contain " + new_number + " "  + line + "\n");
             }
         }
     }

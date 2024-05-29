@@ -12,6 +12,7 @@ import java.util.*;
         public void analyzeAndPrintClusters(String outputFile) {
             calculateThreshold();
             calculateMostUsedTogether(); // En çok birlikte kullanılanları hesapla
+            System.out.println(importUsage.size());
 
             Map<String, Set<String>> clusters = new HashMap<>();
             Set<String> remainingFiles = new HashSet<>(importUsage.keySet());
@@ -48,16 +49,11 @@ import java.util.*;
             }
 
             try (PrintWriter writer = new PrintWriter(new FileWriter(outputFile))) {
-                writer.println("Threshold: " + threshold);
-                writer.println();
-
-                int clusterId = 1;
+                int clusterId = 0;
                 for (Set<String> cluster : clusters.values()) {
-                    writer.println("Cluster " + clusterId + ":");
                     for (String file : cluster) {
-                        writer.println("\t" + file);
+                        writer.println("contain " + clusterId + " " + file);
                     }
-                    writer.println();
                     clusterId++;
                 }
             } catch (IOException e) {

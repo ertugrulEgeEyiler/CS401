@@ -1,12 +1,9 @@
-
 package Clusterer;
 
 import java.io.*;
 import java.util.*;
 
 public class GeneticAlgorithm extends Clustering {
-
-
     private int populationSize;
     private int numClusters;
     private int maxGenerations;
@@ -74,7 +71,6 @@ public class GeneticAlgorithm extends Clustering {
     }
 
     private Map<String, Integer> select(List<Map<String, Integer>> population) {
-        // Simple roulette wheel selection based on fitness
         double totalFitness = population.stream().mapToDouble(this::calculateFitness).sum();
         double slice = random.nextDouble() * totalFitness;
         double current = 0;
@@ -107,8 +103,6 @@ public class GeneticAlgorithm extends Clustering {
     }
 
     private double calculateFitness(Map<String, Integer> individual) {
-        // This is a placeholder for a real fitness function
-        // Typically, this would involve calculating intra-cluster and inter-cluster distances
         return individual.values().stream().distinct().count();
     }
 
@@ -117,7 +111,7 @@ public class GeneticAlgorithm extends Clustering {
         for (Map.Entry<String, Integer> entry : clusterData.entrySet()) {
             int clusterId = entry.getValue();
             String importItem = entry.getKey();
-            outputFormat.computeIfAbsent(clusterId, k -> new StringBuilder()).append(importItem).append("\n");
+            outputFormat.computeIfAbsent(clusterId, k -> new StringBuilder()).append("contain ").append(clusterId).append(" ").append(importItem).append("\n");
         }
         return outputFormat;
     }
@@ -125,10 +119,9 @@ public class GeneticAlgorithm extends Clustering {
     public void writeClusters(Map<Integer, StringBuilder> clusters, String outputFile) throws IOException {
         try (FileWriter writer = new FileWriter(outputFile)) {
             for (Map.Entry<Integer, StringBuilder> entry : clusters.entrySet()) {
-                writer.write("Cluster " + entry.getKey() + ":\n");
+                System.out.println(entry.getValue().toString());
                 writer.write(entry.getValue().toString());
             }
         }
     }
 }
-

@@ -1,0 +1,8 @@
+Import Name,Main.java,Clustering.java,GeneticAlgorithm.java,ImportClusterer.java,ImportFinder.java,ImportRelationshipAnalyzer.java,KModeClusterer.java,
+Main.java,0,2,2,2,2,2,2,
+Clustering.java,2,0,2,2,2,2,2,
+GeneticAlgorithm.java,2,2,0,2,2,2,2,
+ImportClusterer.java,2,2,2,0,2,2,2,
+ImportFinder.java,2,2,2,2,0,2,2,
+ImportRelationshipAnalyzer.java,2,2,2,2,2,0,2,
+KModeClusterer.java,2,2,2,2,2,2,0,

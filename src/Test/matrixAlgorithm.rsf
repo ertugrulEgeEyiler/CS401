@@ -1,8 +1,0 @@
-contain 0 
-contain 0 	Clusterer.GeneticAlgorithm
-contain 0 	Clusterer.ImportClusterer
-contain 0 	Clusterer.ImportRelationshipAnalyzer
-contain 0 	Clusterer.KModeClusterer
-contain 0 	Parser.ImportFinder
-contain 0 	Test.Test
-List of all java imports:

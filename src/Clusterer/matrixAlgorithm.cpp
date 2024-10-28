@@ -1,181 +1,204 @@
 #include <iostream>
 #include <fstream>
-#include <vector>
 #include <map>
 #include <set>
+#include <vector>
+#include <string>
 #include <sstream>
 #include <algorithm>
 
+#define SPLIT_STRING(str, delim) [&](const std::string& s) { \
+    std::vector<std::string> tokens; \
+    std::string token; \
+    std::istringstream tokenStream(s); \
+    while (std::getline(tokenStream, token, delim)) { \
+        tokens.push_back(token); \
+    } \
+    return tokens; \
+}(str)
+
 using namespace std;
 
-// Helper function to split strings by a delimiter
-vector<string> split(const string &str, char delimiter) {
-    vector<string> tokens;
-    string token;
-    istringstream tokenStream(str);
-    while (getline(tokenStream, token, delimiter)) {
-        tokens.push_back(token);
-    }
-    return tokens;
-}
+// Set of special packages that will be clustered separately
+const set<string> special_packages = {
+    "java", "Math", "com.sun", "javax", "jdk.internal", "META-INF.services", "sun"
+};
 
-// Function to parse the import data from the output.txt
-map<string, set<string>> parseImports(const string &filePath) {
-    ifstream file(filePath);
-    map<string, set<string>> fileImports;
-    string line, currentFile;
+// Struct to hold the imports for each class
+struct ImportInfo {
+    string className;
+    vector<string> imports;
+};
+
+// Function to read the output.txt file and extract import information
+vector<ImportInfo> read_imports(const string& filename) {
+    vector<ImportInfo> import_data;
+    ifstream file(filename);
+    string line, current_class;
     
     while (getline(file, line)) {
         if (line.find("imports:") != string::npos) {
-            currentFile = line.substr(0, line.find(" imports"));
-            cout << "Processing file: " << currentFile << endl;  // Debugging: Which file is being processed
+            current_class = line.substr(0, line.find(" imports:"));
+            import_data.push_back(ImportInfo{current_class, {}});
+        } else if (!line.empty()) {
+            import_data.back().imports.push_back(line);
+        }
+    }
+    return import_data;
+}
+
+// Function to extract cluster key based on special packages or general imports
+string extract_cluster_key(const string& import_statement) {
+    auto parts = SPLIT_STRING(import_statement, '.');
+
+    // Check if the package starts with one of the special packages
+    if (special_packages.find(parts[0]) != special_packages.end()) {
+        if (parts.size() > 1) {
+            return parts[0] + "." + parts[1];  // e.g. java.util, java.io
         } else {
-            fileImports[currentFile].insert(line);
-            cout << "Found import: " << line << endl;  // Debugging: Which imports are found
+            return parts[0];  // e.g. just java or javax
         }
     }
-    
-    file.close();
-    return fileImports;
+
+    // Return a general key for non-special packages
+    if (parts.size() > 1) {
+        return parts[0] + "." + parts[1];  // for other imports
+    }
+    return import_statement;
 }
 
-// Function to cluster java.<package> imports separately and return a list of java clusters
-map<string, set<string>> clusterJavaPackages(const map<string, set<string>>& fileImports, vector<string>& javaImportsList) {
-    map<string, set<string>> javaClusters;
-
-    for (const auto& [file, imports] : fileImports) {
-        for (const string& imp : imports) {
-            if (imp.find("java.") == 0) {  // If the import starts with "java."
-                vector<string> parts = split(imp, '.');
-                if (parts.size() > 1) {
-                    string packageName = "java." + parts[1];  // Take "java.io", "java.util", etc.
-                    javaClusters[packageName].insert(imp);  // Add the full import to the corresponding cluster
-                    javaImportsList.push_back(imp); // Add to the java imports list
-
-                    // Debugging: Show which java import is added to the list
-                    cout << "Added java import to list: " << imp << " from file: " << file << endl;
-                }
+// Function to filter and process imports for clustering
+map<string, set<string>> cluster_imports(const vector<ImportInfo>& imports) {
+    map<string, set<string>> clusters;
+    
+    for (const auto& info : imports) {
+        for (const auto& imp : info.imports) {
+            string cluster_key = extract_cluster_key(imp);
+            if (!cluster_key.empty()) {
+                clusters[cluster_key].insert(info.className);  // Cluster imports by package/class name
             }
         }
     }
-
-    return javaClusters;
-}
-
-// Function to generate co-occurrence matrix for non-java imports
-map<pair<string, string>, int> generateCoOccurrenceMatrix(const map<string, set<string>>& fileImports) {
-    map<pair<string, string>, int> coOccurrenceMatrix;
-
-    for (const auto& [file, imports] : fileImports) {
-        for (const string& imp1 : imports) {
-            if (imp1.find("java.") == string::npos) {  // Exclude java imports
-                for (const string& imp2 : imports) {
-                    if (imp1 != imp2 && imp2.find("java.") == string::npos) {
-                        pair<string, string> importPair = make_pair(min(imp1, imp2), max(imp1, imp2));
-                        coOccurrenceMatrix[importPair]++;
-                    }
-                }
-            }
-        }
-    }
-
-    return coOccurrenceMatrix;
-}
-
-// Function to perform clustering based on co-occurrences (for non-java imports)
-vector<vector<string>> clusterImports(const map<pair<string, string>, int>& coOccurrenceMatrix, int threshold) {
-    map<string, int> clusterMap;
-    vector<vector<string>> clusters;
-    
-    for (const auto& [importPair, count] : coOccurrenceMatrix) {
-        if (count >= threshold) {
-            string imp1 = importPair.first;
-            string imp2 = importPair.second;
-            
-            if (clusterMap.find(imp1) == clusterMap.end() && clusterMap.find(imp2) == clusterMap.end()) {
-                // New cluster
-                clusters.push_back({imp1, imp2});
-                int clusterIndex = clusters.size() - 1;
-                clusterMap[imp1] = clusterIndex;
-                clusterMap[imp2] = clusterIndex;
-            } else if (clusterMap.find(imp1) != clusterMap.end() && clusterMap.find(imp2) == clusterMap.end()) {
-                // Add imp2 to imp1's cluster
-                int clusterIndex = clusterMap[imp1];
-                clusters[clusterIndex].push_back(imp2);
-                clusterMap[imp2] = clusterIndex;
-            } else if (clusterMap.find(imp1) == clusterMap.end() && clusterMap.find(imp2) != clusterMap.end()) {
-                // Add imp1 to imp2's cluster
-                int clusterIndex = clusterMap[imp2];
-                clusters[clusterIndex].push_back(imp1);
-                clusterMap[imp1] = clusterIndex;
-            }
-        }
-    }
-    
     return clusters;
 }
 
-// Function to write clusters and java.<package> imports to matrixAlgorithm.rsf file
-void writeClustersToFile(const map<string, set<string>>& javaClusters, const vector<vector<string>>& nonJavaClusters, const string &outputFilePath, const vector<string>& javaImportsList) {
-    ofstream outFile(outputFilePath);
+// Function to create a mapping of cluster keys to numbers
+map<string, int> create_class_mapping(const map<string, set<string>>& clusters) {
+    map<string, int> class_mapping;
+    int current_number = 0;
 
-    int clusterId = 0;
-
-    // Write java clusters
-    for (const auto& [packageName, imports] : javaClusters) {
-        cout << "Writing java cluster: " << packageName << " with " << imports.size() << " imports" << endl;  // Debugging
-        for (const string& imp : imports) {
-            outFile << "contain " << clusterId << " " << imp << endl;
+    // Number the clusters sequentially
+    for (const auto& cluster : clusters) {
+        if (class_mapping.find(cluster.first) == class_mapping.end()) {
+            class_mapping[cluster.first] = current_number++;
         }
-        clusterId++;
     }
 
-    // Write non-java clusters
-    for (const auto& cluster : nonJavaClusters) {
-        for (const string& imp : cluster) {
-            outFile << "contain " << clusterId << " " << imp << endl;
-        }
-        clusterId++;
-    }
-
-    // Write the list of all java.<package> imports separately
-    outFile << "List of all java imports:" << endl;
-    for (const auto& imp : javaImportsList) {
-        outFile << imp << endl;
-    }
-
-    outFile.close();
+    return class_mapping;
 }
 
-int main(int argc, char* argv[]) {
-    if (argc != 3) {
-        cerr << "Usage: " << argv[0] << " <input_file> <output_file>" << endl;
-        return 1;
+// Function to write the RSF file output for clusters
+void write_rsf_file(const map<string, set<string>>& clusters, const map<string, int>& class_mapping, const string& filename) {
+    ofstream rsf_file(filename);
+    if (!rsf_file.is_open()) {
+        cerr << "Error: Could not open RSF file: " << filename << endl;
+        return;
     }
 
-    string inputFilePath = argv[1];  // First command-line argument is input file
-    string outputFilePath = argv[2];  // Second command-line argument is output file
-    
-    // Parse imports from file
-    map<string, set<string>> fileImports = parseImports(inputFilePath);
-    
-    // Prepare a list to store all java.<package> imports
-    vector<string> javaImportsList;
-    
-    // Cluster java packages separately and populate javaImportsList
-    map<string, set<string>> javaClusters = clusterJavaPackages(fileImports, javaImportsList);
-    
-    // Generate co-occurrence matrix for non-java imports
-    map<pair<string, string>, int> coOccurrenceMatrix = generateCoOccurrenceMatrix(fileImports);
-    
-    // Perform clustering for non-java imports
-    int threshold = 2;  // Define your threshold for clustering
-    vector<vector<string>> nonJavaClusters = clusterImports(coOccurrenceMatrix, threshold);
-    
-    // Write the clusters and java imports to matrixAlgorithm.rsf file
-    writeClustersToFile(javaClusters, nonJavaClusters, outputFilePath, javaImportsList);
-    
-    cout << "Clustering completed and saved to " << outputFilePath << endl;
-    
+    for (const auto& cluster : clusters) {
+        int cluster_number = class_mapping.at(cluster.first);
+        for (const auto& import_name : cluster.second) {
+            rsf_file << "contain " << cluster_number << " " << cluster.first << " " << import_name << endl;
+        }
+    }
+
+    rsf_file.close();
+    if (!rsf_file) {
+        cerr << "Error: Could not successfully close file: " << filename << endl;
+    }
+}
+
+// Function to create co-occurrence matrix
+vector<vector<int>> create_cooccurrence_matrix(const map<string, set<string>>& clusters, vector<string>& unique_imports) {
+    map<string, int> import_indices;
+    int index = 0;
+
+    // Get all unique import names
+    for (const auto& cluster : clusters) {
+        for (const auto& import_name : cluster.second) {
+            if (find(unique_imports.begin(), unique_imports.end(), import_name) == unique_imports.end()) {
+                unique_imports.push_back(import_name);
+                import_indices[import_name] = index++;
+            }
+        }
+    }
+
+    // Initialize the co-occurrence matrix
+    vector<vector<int>> matrix(unique_imports.size(), vector<int>(unique_imports.size(), 0));
+
+    // Fill the co-occurrence matrix
+    for (const auto& cluster : clusters) {
+        const auto& import_set = cluster.second;
+        for (auto it1 = import_set.begin(); it1 != import_set.end(); ++it1) {
+            for (auto it2 = next(it1); it2 != import_set.end(); ++it2) {
+                matrix[import_indices[*it1]][import_indices[*it2]]++;
+                matrix[import_indices[*it2]][import_indices[*it1]]++;
+            }
+        }
+    }
+
+    return matrix;
+}
+
+// Function to write the co-occurrence matrix to a CSV file
+void write_matrix_to_csv(const vector<vector<int>>& matrix, const vector<string>& import_names, const string& filename) {
+    ofstream csv_file(filename);
+    if (!csv_file.is_open()) {
+        cerr << "Error: Could not open CSV file: " << filename << endl;
+        return;
+    }
+
+    // Write the header row
+    csv_file << "Import Name,";
+    for (const auto& import_name : import_names) {
+        csv_file << import_name << ",";
+    }
+    csv_file << endl;
+
+    // Write the co-occurrence matrix
+    for (size_t i = 0; i < matrix.size(); ++i) {
+        csv_file << import_names[i] << ",";
+        for (size_t j = 0; j < matrix[i].size(); ++j) {
+            csv_file << matrix[i][j] << ",";
+        }
+        csv_file << endl;
+    }
+
+    csv_file.close();
+}
+
+// Main function
+int main() {
+    // Step 1: Read imports from the file
+    auto imports = read_imports("C:\\Users\\kalma\\OneDrive\\Belgeler\\GitHub\\CS401\\src\\Test\\output.txt");
+
+    // Step 2: Process imports and cluster them together
+    auto clusters = cluster_imports(imports);
+
+    // Step 3: Create a mapping for clusters
+    auto class_mapping = create_class_mapping(clusters);
+
+    // Step 4: Write the RSF file with the correct format
+    write_rsf_file(clusters, class_mapping, "C:\\Users\\kalma\\OneDrive\\Belgeler\\GitHub\\CS401\\src\\Clusterer\\import_clusters.rsf");
+
+    // Step 5: Create co-occurrence matrix
+    vector<string> unique_imports;
+    auto cooccurrence_matrix = create_cooccurrence_matrix(clusters, unique_imports);
+
+    // Step 6: Write the co-occurrence matrix to CSV
+    write_matrix_to_csv(cooccurrence_matrix, unique_imports, "C:\\Users\\kalma\\OneDrive\\Belgeler\\GitHub\\CS401\\src\\Clusterer\\co_occurrence_matrix.csv");
+
+    cout << "Clustering and CSV output written to 'import_clusters.rsf' and 'co_occurrence_matrix.csv'." << endl;
+
     return 0;
 }

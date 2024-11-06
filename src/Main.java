@@ -14,13 +14,13 @@ public class Main {
     public static void main(String[] args) throws IOException {
         ImportFinder importFinder = new ImportFinder();
         ImportClusterer importClusterer = new ImportClusterer();
-        KModeClusterer kModesClusterer = new KModeClusterer(5);
-        GeneticAlgorithm gaClusterer = new GeneticAlgorithm(10, 5, 50, 0.05);
+        KModeClusterer kModesClusterer = new KModeClusterer(2);
+        GeneticAlgorithm gaClusterer = new GeneticAlgorithm(10, 2, 50, 0.05);
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("Please enter the directory of your project.");
         String directory = scanner.nextLine();
-        String currentDirectory = "C:\\Users\\kalma\\OneDrive\\Belgeler\\GitHub\\CS401";
+        String currentDirectory = "C:\\Users\\zeroc\\IdeaProjects\\CS401_2";
         File dir = new File(directory);
 
         if (!dir.exists()) {
@@ -77,8 +77,8 @@ public class Main {
         analyzer.readFile(outputFile);
         analyzer.analyzeAndPrintClusters(relationshipOutputFile);
         System.out.println("Import clustering completed, results saved to: " + relationshipOutputFile);
+
     }
-    
     public void test() {
         Test test = new Test();
     }

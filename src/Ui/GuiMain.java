@@ -31,7 +31,7 @@ public class GuiMain {
         panel.add(button);
         PathListener pathListener = new PathListener(userInput);
         button.addActionListener(pathListener);
-        button.setBounds(450, 280, 80, 25);
+        button.setBounds(450, 280, 120, 25);
         frame.setVisible(true);
 
 

@@ -1,5 +1,9 @@
 package Ui;
 
+import Ui.Listener.ClusterListener;
+import Ui.Listener.GraphListener;
+import Ui.Listener.SaveListener;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -20,6 +24,8 @@ public class ClusterFrame extends JFrame {
         JPanel buttonPanel = new JPanel();
         JPanel outputPanel = new JPanel();
         ClusterListener clusterListener = new ClusterListener(path);
+        SaveListener saveListener = new SaveListener();
+        GraphListener graphListener = new GraphListener();
 
         JButton geneticAlgorithmButton = new JButton("Genetic Algorithm");
         clusterPanel.add(geneticAlgorithmButton);
@@ -37,11 +43,12 @@ public class ClusterFrame extends JFrame {
         clusterPanel.add(importAnalyzerButton);
         importAnalyzerButton.addActionListener(clusterListener);
 
-        JButton confirmButton = new JButton("Confirm");
-        buttonPanel.add(confirmButton);
         JButton graphButton = new JButton("Show Graph");
+        graphButton.addActionListener(graphListener);
         buttonPanel.add(graphButton);
+
         JButton saveButton = new JButton("Save");
+        saveButton.addActionListener(saveListener);
         buttonPanel.add(saveButton);
 
         JButton output = new JButton("Output");

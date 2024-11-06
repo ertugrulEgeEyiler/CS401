@@ -1,10 +1,9 @@
-package Ui;
+package Ui.Listener;
 
 import Clusterer.GeneticAlgorithm;
 import Clusterer.ImportClusterer;
 import Clusterer.ImportRelationshipAnalyzer;
 import Clusterer.KModeClusterer;
-import Parser.ImportFinder;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

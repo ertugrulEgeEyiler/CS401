@@ -7,8 +7,6 @@ import javax.swing.*;
 
 public class GuiMain {
 
-    private static ImportFinder importFinder = new ImportFinder();
-
     public static void main(String[] args) {
     JPanel panel = new JPanel();
     JFrame frame = new JFrame();
@@ -31,7 +29,6 @@ public class GuiMain {
         button.addActionListener(pathListener);
         button.setBounds(450, 280, 120, 25);
         frame.setVisible(true);
-
 
 }
 }

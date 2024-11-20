@@ -34,5 +34,6 @@ public class PathListener implements ActionListener {
         }
         catch (FileNotFoundException e1) {}
         ClusterFrame clusterFrame = new ClusterFrame(path);
+
     }
 }

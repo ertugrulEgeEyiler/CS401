@@ -6,6 +6,10 @@ import Ui.Listener.SaveListener;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 
 public class ClusterFrame extends JFrame {
     private String path;
@@ -13,12 +17,15 @@ public class ClusterFrame extends JFrame {
     public ClusterFrame(String path) {
         this.path = path;
         init();
+
     }
 
     private void init() {
         this.setSize(900, 600);
         this.setLocationRelativeTo(null);
         this.setLayout(null);
+        String currentPath = System.getProperty("user.dir");
+        String memoryPath = currentPath + File.separator + "src" + File.separator + "Memory";
 
         JPanel clusterPanel = new JPanel();
         JPanel buttonPanel = new JPanel();
@@ -51,19 +58,34 @@ public class ClusterFrame extends JFrame {
         saveButton.addActionListener(saveListener);
         buttonPanel.add(saveButton);
 
-        JButton output = new JButton("Output");
-        outputPanel.add(output);
+        JTextArea outputArea = new JTextArea();
+
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(memoryPath + File.separator + "output.txt"));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                outputArea.append(line + "\n");
+            }
+        }
+        catch (IOException e) {
+            System.out.println("Error");
+        }
+        JScrollPane outputScrollPane = new JScrollPane(outputArea);
+        outputScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        outputPanel.add(outputScrollPane);
 
         clusterPanel.setLayout(new GridLayout());
         clusterPanel.setBounds(0, 0, 900, 50);
-        buttonPanel.setLayout(new GridLayout());
+//        buttonPanel.setLayout(new GridLayout());
         buttonPanel.setBounds(0, 52, 900, 50);
         outputPanel.setBounds(0, 200, 900, 300);
+        outputScrollPane.setBounds(0,0,900,100);
 
         this.add(clusterPanel);
         this.add(buttonPanel);
         this.add(outputPanel);
         this.setVisible(true);
+
 
     }
 }

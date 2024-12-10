@@ -1,9 +1,20 @@
-contain 0 	Clusterer.GeneticAlgorithm Main.java
-contain 1 	Clusterer.ImportClusterer Main.java
-contain 2 	Clusterer.ImportRelationshipAnalyzer Main.java
-contain 3 	Clusterer.KModeClusterer Main.java
-contain 4 	Parser.ImportFinder Main.java
-contain 5 	Test.Test Main.java
-contain 6 	java.io Clustering.java
-contain 6 	java.nio ImportFinder.java
-contain 6 	java.util Clustering.java
+contain 0	java.io.*
+contain 0	java.io.BufferedReader
+contain 0	java.io.File
+contain 0	java.io.FileNotFoundException
+contain 0	java.io.FileReader
+contain 0	java.io.FileWriter
+contain 0	java.io.IOException
+contain 0	java.io.PrintWriter
+contain 0	java.nio.file.*
+contain 0	java.util.*
+contain 0	java.util.HashMap
+contain 0	java.util.Map
+contain 0	java.util.Scanner
+contain 0	java.util.TreeMap
+contain 1	Clusterer.GeneticAlgorithm
+contain 1	Clusterer.ImportClusterer
+contain 1	Clusterer.ImportRelationshipAnalyzer
+contain 1	Clusterer.KModeClusterer
+contain 1	Parser.ImportFinder
+contain 1	Test.Test

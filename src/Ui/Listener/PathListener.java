@@ -13,11 +13,13 @@ import java.io.PrintWriter;
 public class PathListener implements ActionListener {
     private JTextField userInput;
     private ImportFinder importFinder;
+    JFrame frame;
 
 
-    public PathListener(JTextField userInput) {
+    public PathListener(JTextField userInput,JFrame frame) {
         this.userInput = userInput;
         importFinder = new ImportFinder();
+        this.frame = frame;
     }
 
     @Override
@@ -31,9 +33,13 @@ public class PathListener implements ActionListener {
             PrintWriter printWriter = new PrintWriter(outputFile);
             importFinder.createImports(path, printWriter);
             printWriter.close();
+            ClusterFrame clusterFrame = new ClusterFrame(path);
+            frame.dispose();
+
         }
-        catch (FileNotFoundException e1) {}
-        ClusterFrame clusterFrame = new ClusterFrame(path);
+        catch (FileNotFoundException e1) {
+
+        }
 
     }
 }

@@ -4,6 +4,7 @@ import Parser.ImportFinder;
 import Ui.Listener.PathListener;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
 
 public class GuiMain {
 
@@ -25,7 +26,7 @@ public class GuiMain {
 
     JButton button = new JButton("Confirm");
         panel.add(button);
-        PathListener pathListener = new PathListener(userInput);
+        PathListener pathListener = new PathListener(userInput,frame);
         button.addActionListener(pathListener);
         button.setBounds(450, 280, 120, 25);
         frame.setVisible(true);

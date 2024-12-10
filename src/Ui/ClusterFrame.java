@@ -24,14 +24,15 @@ public class ClusterFrame extends JFrame {
         this.setSize(900, 600);
         this.setLocationRelativeTo(null);
         this.setLayout(null);
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
         String currentPath = System.getProperty("user.dir");
         String memoryPath = currentPath + File.separator + "src" + File.separator + "Memory";
 
         JPanel clusterPanel = new JPanel();
         JPanel buttonPanel = new JPanel();
         JPanel outputPanel = new JPanel();
-        ClusterListener clusterListener = new ClusterListener(path);
-        SaveListener saveListener = new SaveListener();
+        ClusterListener clusterListener = new ClusterListener(path,this);
         GraphListener graphListener = new GraphListener();
 
         JButton geneticAlgorithmButton = new JButton("Genetic Algorithm");
@@ -50,12 +51,16 @@ public class ClusterFrame extends JFrame {
         clusterPanel.add(importAnalyzerButton);
         importAnalyzerButton.addActionListener(clusterListener);
 
+        JButton cluster = new JButton("Ertugrul Cluster");
+        clusterPanel.add(cluster);
+        cluster.addActionListener(clusterListener);
+
         JButton graphButton = new JButton("Show Graph");
         graphButton.addActionListener(graphListener);
         buttonPanel.add(graphButton);
 
         JButton saveButton = new JButton("Save");
-        saveButton.addActionListener(saveListener);
+        saveButton.addActionListener(clusterListener);
         buttonPanel.add(saveButton);
 
         JTextArea outputArea = new JTextArea();
@@ -70,13 +75,14 @@ public class ClusterFrame extends JFrame {
         catch (IOException e) {
             System.out.println("Error");
         }
+
         JScrollPane outputScrollPane = new JScrollPane(outputArea);
         outputScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         outputPanel.add(outputScrollPane);
 
         clusterPanel.setLayout(new GridLayout());
         clusterPanel.setBounds(0, 0, 900, 50);
-//        buttonPanel.setLayout(new GridLayout());
+        buttonPanel.setLayout(new GridLayout());
         buttonPanel.setBounds(0, 52, 900, 50);
         outputPanel.setBounds(0, 200, 900, 300);
         outputScrollPane.setBounds(0,0,900,100);

@@ -4,6 +4,7 @@ import Clusterer.GeneticAlgorithm;
 import Clusterer.ImportClusterer;
 import Clusterer.ImportRelationshipAnalyzer;
 import Clusterer.KModeClusterer;
+import Ui.SaveFrame;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -15,10 +16,13 @@ import java.io.IOException;
 public class ClusterListener implements ActionListener {
     private JButton button;
     private String path;
+    private JFrame frame;
 
-    public ClusterListener(String path) {
+    public ClusterListener(String path, JFrame frame) {
         this.path = path;
+        this.frame = frame;
     }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         JButton button = (JButton) e.getSource();
@@ -46,7 +50,7 @@ public class ClusterListener implements ActionListener {
             }
         }
         if(button.getText().equals("KMode Clusterer")) {
-            KModeClusterer kModesClusterer = new KModeClusterer(2);
+            KModeClusterer kModesClusterer = new KModeClusterer(5);
             String kModesOutputFile = memoryPath + File.separator + "kModesOutput.rsf";
             try{
             kModesClusterer.executeClustering(outputFile, kModesOutputFile);
@@ -59,7 +63,10 @@ public class ClusterListener implements ActionListener {
             ImportRelationshipAnalyzer analyzer = new ImportRelationshipAnalyzer();
             analyzer.readFile(outputFile);
             analyzer.analyzeAndPrintClusters(relationshipOutputFile);
-            System.out.println("Import clustering completed, results saved to: " + relationshipOutputFile);
+        }
+        if(button.getText().equals("Save")) {
+            frame.dispose();
+            SaveFrame saveFrame = new SaveFrame();
         }
     }
 }

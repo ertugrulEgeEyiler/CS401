@@ -9,18 +9,27 @@ import Ui.SaveFrame;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 
 public class ClusterListener implements ActionListener {
     private JButton button;
     private String path;
     private JFrame frame;
+    private JTextArea outputArea; // Add this
 
-    public ClusterListener(String path, JFrame frame) {
+
+    public ClusterListener(String path, JFrame frame, JTextArea outputArea) {
         this.path = path;
         this.frame = frame;
+        this.outputArea = outputArea;
     }
 
     @Override
@@ -29,44 +38,56 @@ public class ClusterListener implements ActionListener {
         String currentPath = System.getProperty("user.dir");
         System.out.println(currentPath);
         String memoryPath = currentPath + File.separator + "src" + File.separator + "Memory";
-        String outputFile = memoryPath + File.separator + "output.txt";
 
         if(button.getText().equals("Genetic Algorithm")) {
-            GeneticAlgorithm gaClusterer = new GeneticAlgorithm(10, 2, 50, 0.05);
-            String gaAlgorithmClusterFile = memoryPath + File.separator + "gaAlgorithmCluster.rsf";
-            try {
-                gaClusterer.findClusters(outputFile, gaAlgorithmClusterFile);
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
+            displayClusterOutput(memoryPath + File.separator + "gaAlgorithmCluster.rsf");
         }
         if(button.getText().equals("Import Clusterer")) {
-            ImportClusterer importClusterer = new ImportClusterer();
-            String clusteredFile = memoryPath + File.separator + "clustered.rsf";
-            try{
-            importClusterer.findClusters(outputFile, clusteredFile);
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
+            displayClusterOutput(memoryPath + File.separator + "clustered.rsf");
         }
         if(button.getText().equals("KMode Clusterer")) {
-            KModeClusterer kModesClusterer = new KModeClusterer(5);
-            String kModesOutputFile = memoryPath + File.separator + "kModesOutput.rsf";
-            try{
-            kModesClusterer.executeClustering(outputFile, kModesOutputFile);
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
+            displayClusterOutput(memoryPath + File.separator + "kModesOutput.rsf");
         }
         if(button.getText().equals("Import Analyzer Clusterer")) {
-            String relationshipOutputFile = memoryPath + File.separator + "relationshipOutput.rsf";
-            ImportRelationshipAnalyzer analyzer = new ImportRelationshipAnalyzer();
-            analyzer.readFile(outputFile);
-            analyzer.analyzeAndPrintClusters(relationshipOutputFile);
+            displayClusterOutput(memoryPath + File.separator + "relationshipOutput.rsf");
         }
         if(button.getText().equals("Save")) {
             frame.dispose();
             SaveFrame saveFrame = new SaveFrame();
         }
     }
+    private void displayClusterOutput(String clusterOutputFile) {
+        try {
+            outputArea.setText("");
+            outputArea.append("Cluster Output:\n");
+            int mojoScore = 1;   // Will change
+            outputArea.append("Mojo Score: " + mojoScore +"\n");
+            Map<String, List<String>> clusters = new TreeMap<>();
+            try (BufferedReader reader = new BufferedReader(new FileReader(clusterOutputFile))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    if (line.startsWith("contain")) {
+                        String[] parts = line.split(" ");
+                        if (parts.length >= 3) {
+                            String clusterId = parts[1];
+                            String item = parts[2];
+                            clusters.computeIfAbsent(clusterId, k -> new ArrayList<>()).add(item);
+                        }
+                    }
+                }
+            }
+
+            // Display the clusters in the output area
+            for (Map.Entry<String, List<String>> entry : clusters.entrySet()) {
+                outputArea.append("Cluster " + entry.getKey() + ":\n");
+                for (String item : entry.getValue()) {
+                    outputArea.append("  - " + item + "\n");
+                }
+                outputArea.append("\n");
+            }
+        } catch (IOException ex) {
+            outputArea.append("Error reading cluster output file: " + ex.getMessage() + "\n");
+        }
+    }
+
 }

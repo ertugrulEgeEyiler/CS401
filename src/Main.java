@@ -14,7 +14,7 @@ public class Main {
     public static void main(String[] args) throws IOException {
         ImportFinder importFinder = new ImportFinder();
         ImportClusterer importClusterer = new ImportClusterer();
-        KModeClusterer kModesClusterer = new KModeClusterer(2);
+        KModeClusterer kModesClusterer = new KModeClusterer(4);
         GeneticAlgorithm gaClusterer = new GeneticAlgorithm(10, 2, 50, 0.05);
         Scanner scanner = new Scanner(System.in);
 

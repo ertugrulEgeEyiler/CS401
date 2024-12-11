@@ -1,5 +1,9 @@
 package Ui;
 
+import Clusterer.GeneticAlgorithm;
+import Clusterer.ImportClusterer;
+import Clusterer.ImportRelationshipAnalyzer;
+import Clusterer.KModeClusterer;
 import Ui.Listener.ClusterListener;
 import Ui.Listener.GraphListener;
 import Ui.Listener.SaveListener;
@@ -13,26 +17,26 @@ import java.io.IOException;
 
 public class ClusterFrame extends JFrame {
     private String path;
+    private String memoryPath;
 
     public ClusterFrame(String path) {
         this.path = path;
+        this.memoryPath = System.getProperty("user.dir") + File.separator + "src" + File.separator + "Memory";
+        generateClusters(memoryPath);
         init();
-
     }
 
     private void init() {
         this.setSize(900, 600);
         this.setLocationRelativeTo(null);
-        this.setLayout(null);
+        this.setLayout(new GridLayout());
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        String currentPath = System.getProperty("user.dir");
-        String memoryPath = currentPath + File.separator + "src" + File.separator + "Memory";
 
         JPanel clusterPanel = new JPanel();
         JPanel buttonPanel = new JPanel();
         JPanel outputPanel = new JPanel();
-        ClusterListener clusterListener = new ClusterListener(path,this);
+        JTextArea outputArea = new JTextArea();
+        ClusterListener clusterListener = new ClusterListener(path,this, outputArea);
         GraphListener graphListener = new GraphListener();
 
         JButton geneticAlgorithmButton = new JButton("Genetic Algorithm");
@@ -63,8 +67,6 @@ public class ClusterFrame extends JFrame {
         saveButton.addActionListener(clusterListener);
         buttonPanel.add(saveButton);
 
-        JTextArea outputArea = new JTextArea();
-
         try {
             BufferedReader reader = new BufferedReader(new FileReader(memoryPath + File.separator + "output.txt"));
             String line;
@@ -80,18 +82,47 @@ public class ClusterFrame extends JFrame {
         outputScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         outputPanel.add(outputScrollPane);
 
-        clusterPanel.setLayout(new GridLayout());
-        clusterPanel.setBounds(0, 0, 900, 50);
-        buttonPanel.setLayout(new GridLayout());
-        buttonPanel.setBounds(0, 52, 900, 50);
-        outputPanel.setBounds(0, 200, 900, 300);
-        outputScrollPane.setBounds(0,0,900,100);
+        clusterPanel.setLayout(new FlowLayout());
+        clusterPanel.setBounds(0, 0, 10, 10);
+        buttonPanel.setLayout(new FlowLayout());
+        buttonPanel.setBounds(0, 0, 10, 10);
+        outputPanel.setBounds(0, 200, 100, 200);
+        outputPanel.setLayout(new GridLayout());
 
         this.add(clusterPanel);
         this.add(buttonPanel);
         this.add(outputPanel);
         this.setVisible(true);
+    }
 
+    private void generateClusters(String memoryPath) {
+        String outputFile = memoryPath + File.separator + "output.txt";
+
+        GeneticAlgorithm gaClusterer = new GeneticAlgorithm(10, 2, 50, 0.05);
+        String gaAlgorithmClusterFile = memoryPath + File.separator + "gaAlgorithmCluster.rsf";
+        try {
+            gaClusterer.findClusters(outputFile, gaAlgorithmClusterFile);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+        ImportClusterer importClusterer = new ImportClusterer();
+        String clusteredFile = memoryPath + File.separator + "clustered.rsf";
+        try{
+            importClusterer.findClusters(outputFile, clusteredFile);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+        KModeClusterer kModesClusterer = new KModeClusterer(5);
+        String kModesOutputFile = memoryPath + File.separator + "kModesOutput.rsf";
+        try{
+            kModesClusterer.executeClustering(outputFile, kModesOutputFile);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+        String relationshipOutputFile = memoryPath + File.separator + "relationshipOutput.rsf";
+        ImportRelationshipAnalyzer analyzer = new ImportRelationshipAnalyzer();
+        analyzer.readFile(outputFile);
+        analyzer.analyzeAndPrintClusters(relationshipOutputFile);
 
     }
 }

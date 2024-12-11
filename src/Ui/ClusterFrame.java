@@ -37,7 +37,7 @@ public class ClusterFrame extends JFrame {
         JPanel outputPanel = new JPanel();
         JTextArea outputArea = new JTextArea();
         ClusterListener clusterListener = new ClusterListener(path,this, outputArea);
-        GraphListener graphListener = new GraphListener();
+        GraphListener graphListener = new GraphListener(outputArea); // Pass the output area
 
         JButton geneticAlgorithmButton = new JButton("Genetic Algorithm");
         clusterPanel.add(geneticAlgorithmButton);
@@ -97,7 +97,6 @@ public class ClusterFrame extends JFrame {
 
     private void generateClusters(String memoryPath) {
         String outputFile = memoryPath + File.separator + "output.txt";
-
         GeneticAlgorithm gaClusterer = new GeneticAlgorithm(10, 2, 50, 0.05);
         String gaAlgorithmClusterFile = memoryPath + File.separator + "gaAlgorithmCluster.rsf";
         try {

@@ -61,7 +61,7 @@ public class ClusterListener implements ActionListener {
             outputArea.setText("");
             outputArea.append("Cluster Output:\n");
             int mojoScore = 1;   // Will change
-            outputArea.append("Mojo Score: " + mojoScore +"\n");
+           // outputArea.append("Mojo Score: " + mojoScore +"\n");
             Map<String, List<String>> clusters = new TreeMap<>();
             try (BufferedReader reader = new BufferedReader(new FileReader(clusterOutputFile))) {
                 String line;

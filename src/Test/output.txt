@@ -1,0 +1,45 @@
+Clustering.java imports:
+	java.util.Map
+	java.io.IOException
+
+GeneticAlgorithm.java imports:
+	java.util.*
+	java.io.*
+
+ImportClusterer.java imports:
+	java.util.TreeMap
+	java.util.Map
+	java.io.FileWriter
+	java.io.IOException
+	java.util.HashMap
+	java.io.BufferedReader
+	java.io.FileReader
+
+ImportRelationshipAnalyzer.java imports:
+	java.util.*
+	java.io.*
+
+KModeClusterer.java imports:
+	java.util.*
+	java.io.*
+
+Main.java imports:
+	Clusterer.ImportRelationshipAnalyzer
+	java.io.PrintWriter
+	Parser.ImportFinder
+	Test.Test
+	java.util.Scanner
+	java.io.IOException
+	Clusterer.GeneticAlgorithm
+	Clusterer.KModeClusterer
+	java.io.File
+	java.io.FileNotFoundException
+	Clusterer.ImportClusterer
+
+ImportFinder.java imports:
+	java.util.*
+	java.nio.file.*
+	java.io.*
+
+Test.java imports:
+

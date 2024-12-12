@@ -14,13 +14,13 @@ public class Main {
     public static void main(String[] args) throws IOException {
         ImportFinder importFinder = new ImportFinder();
         ImportClusterer importClusterer = new ImportClusterer();
-        KModeClusterer kModesClusterer = new KModeClusterer(4);
-        GeneticAlgorithm gaClusterer = new GeneticAlgorithm(10, 2, 50, 0.05);
+        KModeClusterer kModesClusterer = new KModeClusterer(5);
+        GeneticAlgorithm gaClusterer = new GeneticAlgorithm(10, 5, 50, 0.05);
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("Please enter the directory of your project.");
         String directory = scanner.nextLine();
-        String currentDirectory = "C:\\Users\\zeroc\\IdeaProjects\\CS401_2";
+        String currentDirectory = "C:\\Users\\kalma\\OneDrive\\Belgeler\\GitHub\\CS401";
         File dir = new File(directory);
 
         if (!dir.exists()) {
@@ -56,7 +56,16 @@ public class Main {
         importFinder.createImports(directory, printWriter);
         printWriter.close();
 
-        // Use the specified test directory for all output files
+        // Print the paths for debugging
+        System.out.println("Output file generated: " + outputFile);
+
+        // Run the external C++ clustering algorithm on output.txt
+        String matrixAlgorithmOutput = testPath + File.separator + "matrixAlgorithm.rsf";
+        System.out.println("Clustering algorithm output will be written to: " + matrixAlgorithmOutput);
+        
+        runClusteringAlgorithm(outputFile, matrixAlgorithmOutput);
+
+        // Continue with Java-based clustering
         String clusteredFile = testPath + File.separator + "clustered.rsf";
         importClusterer.findClusters(outputFile, clusteredFile);
         System.out.println("Clustering complete, results saved to: " + clusteredFile);
@@ -77,10 +86,51 @@ public class Main {
         analyzer.readFile(outputFile);
         analyzer.analyzeAndPrintClusters(relationshipOutputFile);
         System.out.println("Import clustering completed, results saved to: " + relationshipOutputFile);
-
     }
+
+    // Function to execute the C++ clustering algorithm
+    public static void runClusteringAlgorithm(String inputFilePath, String outputFilePath) {
+        try {
+            // Full path to the matrixAlgorithm.exe file
+            String exePath = "C:\\Users\\kalma\\OneDrive\\Belgeler\\GitHub\\CS401\\src\\Clusterer\\matrixAlgorithm.exe";
+            
+            // Debug print to ensure the correct paths are used
+            System.out.println("Running clustering algorithm with input: " + inputFilePath + " and output: " + outputFilePath);
+            
+            // Create a ProcessBuilder to run the executable with arguments
+            ProcessBuilder processBuilder = new ProcessBuilder(exePath, inputFilePath, outputFilePath);
+            
+            // Set the working directory to where the executable is located
+            processBuilder.directory(new File("C:\\Users\\kalma\\OneDrive\\Belgeler\\GitHub\\CS401\\src\\Clusterer"));
+            
+            // Redirect error stream to the output stream to capture both stdout and stderr
+            processBuilder.redirectErrorStream(true);
+            
+            // Start the process
+            Process process = processBuilder.start();
+    
+            // Print process output
+            Scanner scanner = new Scanner(process.getInputStream());
+            while (scanner.hasNextLine()) {
+                System.out.println(scanner.nextLine());
+            }
+    
+            // Wait for the process to finish
+            int exitCode = process.waitFor();
+            if (exitCode == 0) {
+                System.out.println("Clustering algorithm completed successfully. Output saved to: " + outputFilePath);
+            } else {
+                System.err.println("Clustering algorithm encountered an error with exit code: " + exitCode);
+            }
+        } catch (IOException | InterruptedException e) {
+            System.err.println("Failed to run clustering algorithm.");
+            e.printStackTrace();
+        }
+    }
+    
+
+    // Test method (placeholder)
     public void test() {
         Test test = new Test();
     }
-
 }

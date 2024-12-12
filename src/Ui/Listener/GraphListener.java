@@ -55,6 +55,7 @@ public class GraphListener implements ActionListener {
         String[] lines = clusterOutput.split("\n");
         int clusterIndex = 0;
         boolean inCluster = false;
+        String previousNode = null;
 
         for (String line : lines) {
             line = line.trim();
@@ -74,10 +75,23 @@ public class GraphListener implements ActionListener {
 
                 clusterIndex++;
                 inCluster = true;
+                previousNode = null; // Reset the previous node for this cluster
             } else if (!line.isEmpty()) {
-                // Add items to the current cluster
+                // Sanitize and clean up import name
                 String sanitizedNode = line.replaceAll("[^a-zA-Z0-9_]", "_");
+                // Remove any leading underscores
+                sanitizedNode = sanitizedNode.replaceFirst("^_+", "");
+
+                // Add the node to the cluster
                 sb.append("\t\t").append(sanitizedNode).append(";\n");
+
+                // If there's a previous node, connect it to the current node
+                if (previousNode != null) {
+                    sb.append("\t\t").append(previousNode).append(" -> ").append(sanitizedNode).append(";\n");
+                }
+
+                // Set the current node as the previous node for the next iteration
+                previousNode = sanitizedNode;
             }
         }
 

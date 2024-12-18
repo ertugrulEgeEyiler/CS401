@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
 
 public class PathListener implements ActionListener {
@@ -29,6 +30,9 @@ public class PathListener implements ActionListener {
         String path = userInput.getText();
         String outputFile = memoryPath + File.separator + "output.txt";
         System.out.println(path);
+        File directory = new File(memoryPath);
+        directory.mkdirs();
+
         try {
             PrintWriter printWriter = new PrintWriter(outputFile);
             importFinder.createImports(path, printWriter);

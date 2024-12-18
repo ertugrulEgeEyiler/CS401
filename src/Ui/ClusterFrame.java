@@ -22,7 +22,6 @@ public class ClusterFrame extends JFrame {
     public ClusterFrame(String path) {
         this.path = path;
         this.memoryPath = System.getProperty("user.dir") + File.separator + "src" + File.separator + "Memory";
-        generateClusters(memoryPath);
         init();
     }
 
@@ -55,9 +54,9 @@ public class ClusterFrame extends JFrame {
         clusterPanel.add(importAnalyzerButton);
         importAnalyzerButton.addActionListener(clusterListener);
 
-        JButton cluster = new JButton("Ertugrul Cluster");
-        clusterPanel.add(cluster);
-        cluster.addActionListener(clusterListener);
+        JButton matrixButton = new JButton("Matrix Cluster");
+        clusterPanel.add(matrixButton);
+        matrixButton.addActionListener(clusterListener);
 
         JButton graphButton = new JButton("Show Graph");
         graphButton.addActionListener(graphListener);
@@ -95,33 +94,5 @@ public class ClusterFrame extends JFrame {
         this.setVisible(true);
     }
 
-    private void generateClusters(String memoryPath) {
-        String outputFile = memoryPath + File.separator + "output.txt";
-        GeneticAlgorithm gaClusterer = new GeneticAlgorithm(10, 2, 50, 0.05);
-        String gaAlgorithmClusterFile = memoryPath + File.separator + "gaAlgorithmCluster.rsf";
-        try {
-            gaClusterer.findClusters(outputFile, gaAlgorithmClusterFile);
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
-        ImportClusterer importClusterer = new ImportClusterer();
-        String clusteredFile = memoryPath + File.separator + "clustered.rsf";
-        try{
-            importClusterer.findClusters(outputFile, clusteredFile);
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
-        KModeClusterer kModesClusterer = new KModeClusterer(5);
-        String kModesOutputFile = memoryPath + File.separator + "kModesOutput.rsf";
-        try{
-            kModesClusterer.executeClustering(outputFile, kModesOutputFile);
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
-        String relationshipOutputFile = memoryPath + File.separator + "relationshipOutput.rsf";
-        ImportRelationshipAnalyzer analyzer = new ImportRelationshipAnalyzer();
-        analyzer.readFile(outputFile);
-        analyzer.analyzeAndPrintClusters(relationshipOutputFile);
 
-    }
 }

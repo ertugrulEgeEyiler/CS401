@@ -10,7 +10,6 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
-import java.sql.Array;
 import java.util.*;
 
 
@@ -84,17 +83,21 @@ public class ClusterListener implements ActionListener {
             SaveFrame saveFrame = new SaveFrame();
         }
     }
-    private void displayClusterOutput(String clusterOutputFile,String name, String outputName) {
+    private void displayClusterOutput(String clusterOutputFile, String name, String outputName) {
         try {
             outputArea.setText("");
-            outputArea.append(name + ";" +"\n");
-            outputArea.append("Mojo Score: " + findMojoScore(outputName) +"\n");
-            Map<String, List<String>> clusters = new TreeMap<>();
+            outputArea.append(name + ";" + "\n");
+            outputArea.append("Mojo Score: " + findMojoScore(outputName) + "\n");
+
+            // Use TreeMap with a custom comparator to sort keys numerically
+            Map<String, List<String>> clusters = new TreeMap<>(Comparator.comparingInt(Integer::parseInt));
+
             try (BufferedReader reader = new BufferedReader(new FileReader(clusterOutputFile))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
                     if (line.startsWith("contain")) {
-                        String[] parts = line.split(" ");
+                        // Use regex to split by one or more spaces
+                        String[] parts = line.trim().split("\\s+");
                         if (parts.length >= 3) {
                             String clusterId = parts[1];
                             String item = parts[2];
@@ -103,6 +106,8 @@ public class ClusterListener implements ActionListener {
                     }
                 }
             }
+
+            // Iterate through sorted clusters and display
             for (Map.Entry<String, List<String>> entry : clusters.entrySet()) {
                 outputArea.append("Cluster " + entry.getKey() + ":\n");
                 for (String item : entry.getValue()) {
@@ -112,7 +117,6 @@ public class ClusterListener implements ActionListener {
             }
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(null, "Failed to display cluster output: " + ex.getMessage());
-
         }
     }
 
@@ -184,13 +188,15 @@ public class ClusterListener implements ActionListener {
         String mainClusterPath =  memoryPath +  File.separator + name + " ";
         Integer[] mojoScores = new Integer[files.length -2];
         if (files != null) {
-            Runtime runtime = Runtime.getRuntime();
             int i = 0;
             for (File file : files) {
                 if (!file.getName().equals(name) & !file.getName().equals("output.txt")) {
                     try {
                         String comparedClusterPath =  memoryPath + File.separator + file.getName();
-                        Process p = runtime.exec(mojoCommand + mainClusterPath + comparedClusterPath +" -fm", null);
+                        String command = mojoCommand + mainClusterPath + comparedClusterPath + " -fm";
+                        System.out.println(command);
+                        System.out.println(comparedClusterPath);
+                        Process p = Runtime.getRuntime().exec(command, null);
                         p.waitFor();
                         InputStream is = p.getInputStream();
                         int score = is.read();

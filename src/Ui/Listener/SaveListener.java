@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
 public class SaveListener implements ActionListener {
     JFrame frame;
@@ -26,30 +27,39 @@ public class SaveListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         JButton button = (JButton) e.getSource();
-        String location = pathInput.getText() + File.separator + "clusterOutput.txt";
-        Path path = Paths.get(location);
 
         if(button.getText().equals("Confirm")){
             String cluster = (String) list.getSelectedValue();
+            String location = pathInput.getText() + File.separator;
             String source = System.getProperty("user.dir") + File.separator + "src" + File.separator + "Memory" + File.separator;
+
             if(cluster.equals("Genetic Algorithm")){
                 source += "gaAlgorithmCluster.rsf";
+                location += "geneticCluster.txt";
             }
-            if(cluster.equals("KMode Clusterer")){
+            else if(cluster.equals("KMode Clusterer")){
                 source += "kModesOutput.rsf";
+                location += "kModeCluster.txt";
             }
-            if(cluster.equals("Import Clusterer")){
+            else if(cluster.equals("Import Clusterer")){
                 source += "clustered.rsf";
+                location += "importCluster.txt";
             }
-            if(cluster.equals("Import Analyzer Clusterer")){
+            else if(cluster.equals("Import Analyzer Clusterer")){
                 source += "relationshipOutput.rsf";
+                location += "importAnalyzerCluster.txt";
             }
-            if(cluster.equals("Matrix Algorithm")){
+            else if(cluster.equals("Matrix Algorithm")){
                 source += "matrixOutput.rsf";
+                location += "matrixCluster.txt";
             }
             Path sourcePath = Paths.get(source);
             try {
-                Files.copy(sourcePath,path);
+
+                Path path = Paths.get(location);
+                Files.createDirectories(path.getParent());
+                Files.copy(sourcePath, path, StandardCopyOption.REPLACE_EXISTING);
+
                 JFrame popUp = new JFrame();
                 JLabel label = new JLabel("Succesfully saved to: " + location);
                 popUp.add(label);

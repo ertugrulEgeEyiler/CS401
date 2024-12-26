@@ -8,7 +8,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.PrintWriter;
 
 public class PathListener implements ActionListener {
@@ -42,6 +41,7 @@ public class PathListener implements ActionListener {
 
         }
         catch (FileNotFoundException e1) {
+            JOptionPane.showMessageDialog(null, "Couldn't find the given path: " + e1.getMessage());
 
         }
 

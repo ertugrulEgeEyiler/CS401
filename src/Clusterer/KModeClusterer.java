@@ -107,7 +107,6 @@ public class KModeClusterer {
 
     private void recalculateModes(List<String> imports) {
         for (int i = 0; i < clusters.size(); i++) {
-            System.out.println("Recalculating mode for cluster " + i + ", size: " + clusters.get(i).size());
             Map<String, Integer> frequency = new HashMap<>();
             for (String imp : clusters.get(i)) {
                 frequency.put(imp, frequency.getOrDefault(imp, 0) + 1);

@@ -9,20 +9,15 @@ import Ui.SaveFrame;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.io.*;
+import java.sql.Array;
+import java.util.*;
 
 
 public class ClusterListener implements ActionListener {
     private JButton button;
     private JFrame frame;
-    private JTextArea outputArea; // Add this
+    private JTextArea outputArea;
     private String memoryPath;
 
     public ClusterListener(String path, JFrame frame, JTextArea outputArea) {
@@ -43,15 +38,15 @@ public class ClusterListener implements ActionListener {
             if(!file.isFile()){
                 generateClusters("gaAlgorithmCluster");
             }
-            displayClusterOutput(memoryPath + File.separator + filename);
+            displayClusterOutput(memoryPath + File.separator + filename, button.getText(), filename);
         }
-        else if(button.getText().equals("Import Cluster")) {
+        else if(button.getText().equals("Import Clusterer")) {
                 filename = "clustered.rsf";
                 File file = new File(memoryPath + File.separator + filename );
                 if(!file.isFile()){
                     generateClusters("clustered");
                 }
-            displayClusterOutput(memoryPath + File.separator + filename);
+            displayClusterOutput(memoryPath + File.separator + filename, button.getText(), filename);
         }
         else if(button.getText().equals("KMode Clusterer")) {
             filename = "kModesOutput.rsf";
@@ -59,7 +54,7 @@ public class ClusterListener implements ActionListener {
             if(!file.isFile()){
                 generateClusters("kModesOutput");
             }
-            displayClusterOutput(memoryPath + File.separator + filename);
+            displayClusterOutput(memoryPath + File.separator + filename, button.getText(), filename);
         }
         else if(button.getText().equals("Import Analyzer Clusterer")) {
             filename = "relationshipOutput.rsf";
@@ -67,7 +62,7 @@ public class ClusterListener implements ActionListener {
             if(!file.isFile()){
                 generateClusters("relationshipOutput");
             }
-            displayClusterOutput(memoryPath + File.separator + filename);
+            displayClusterOutput(memoryPath + File.separator + filename, button.getText(), filename);
         }
         else if(button.getText().equals("Matrix Cluster")) {
             filename = "matrixOutput.rsf";
@@ -75,20 +70,25 @@ public class ClusterListener implements ActionListener {
             if (!file.isFile()) {
              generateClusters("matrixOutput");
             }
-            displayClusterOutput(memoryPath + File.separator + filename);
+            displayClusterOutput(memoryPath + File.separator + filename, button.getText(), filename);
+        }
+        else if(button.getText().equals("Parser Output")){
+            try {
+                outputArea.read(new BufferedReader(new FileReader(memoryPath + File.separator + "output.txt")), null);
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(null, "Failed to display parser output: " + ex.getMessage());
+            }
         }
 
         else if(button.getText().equals("Save")) {
-            frame.dispose();
             SaveFrame saveFrame = new SaveFrame();
         }
     }
-    private void displayClusterOutput(String clusterOutputFile) {
+    private void displayClusterOutput(String clusterOutputFile,String name, String outputName) {
         try {
             outputArea.setText("");
-            outputArea.append("Cluster Output:\n");
-            int mojoScore = 1;   // Will change
-            outputArea.append("Mojo Score: " + mojoScore +"\n");
+            outputArea.append(name + ";" +"\n");
+            outputArea.append("Mojo Score: " + findMojoScore(outputName) +"\n");
             Map<String, List<String>> clusters = new TreeMap<>();
             try (BufferedReader reader = new BufferedReader(new FileReader(clusterOutputFile))) {
                 String line;
@@ -111,7 +111,8 @@ public class ClusterListener implements ActionListener {
                 outputArea.append("\n");
             }
         } catch (IOException ex) {
-            outputArea.append("Error reading cluster output file: " + ex.getMessage() + "\n");
+            JOptionPane.showMessageDialog(null, "Failed to display cluster output: " + ex.getMessage());
+
         }
     }
 
@@ -123,7 +124,7 @@ public class ClusterListener implements ActionListener {
             try {
                 gaAlgorithmCluster.findClusters(outputFile, gaAlgorithmClusterFile);
             } catch (IOException ex) {
-                throw new RuntimeException(ex);
+                JOptionPane.showMessageDialog(null, "Failed to generate cluster: " + ex.getMessage());
             }
         } else if (name.equals("clustered")) {
             ImportClusterer importClusterer = new ImportClusterer();
@@ -131,7 +132,8 @@ public class ClusterListener implements ActionListener {
             try {
                 importClusterer.findClusters(outputFile, clusteredFile);
             } catch (IOException ex) {
-                throw new RuntimeException(ex);
+                JOptionPane.showMessageDialog(null, "Failed to generate cluster: " + ex.getMessage());
+
             }
         }
         else if (name.equals(("kModesOutput"))) {
@@ -140,7 +142,7 @@ public class ClusterListener implements ActionListener {
             try {
                 kModesClusterer.executeClustering(outputFile, kModesOutputFile);
             } catch (IOException ex) {
-                throw new RuntimeException(ex);
+                JOptionPane.showMessageDialog(null, "Failed to generate cluster: " + ex.getMessage());
             }
         }
         else if (name.equals("relationshipOutput")) {
@@ -157,17 +159,55 @@ public class ClusterListener implements ActionListener {
 
                 File exeFile = new File(command);
                 if (!exeFile.exists()) {
-                    System.err.println("Error: File not found -> " + command);
+                    JOptionPane.showMessageDialog(null, "Executable not found.");
                     return;
                 }
-
-                // AWAIT TARZI BIR SEY EKLIYCEZ CALISMASI SURUYOR
-                Runtime.getRuntime().exec(command, null, new File(pathname));
-                System.out.println("Program executed successfully.");
+                Process p = Runtime.getRuntime().exec(command, null, new File(pathname));
+                p.waitFor();
             } catch (IOException ex) {
-                ex.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Failed to generate cluster: " + ex.getMessage());
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
         }
+    }
+
+    private int findMojoScore(String name) {
+        File directory = new File(memoryPath);
+        File[] files = directory.listFiles();
+        int mojoScore = 0;
+        if(files.length <= 2){
+            return mojoScore;
+        }
+
+        String mojoCommand = "java -jar " + System.getProperty("user.dir") + File.separator + "src" + File.separator + "Test" + File.separator + "mojo.jar ";
+        String mainClusterPath =  memoryPath +  File.separator + name + " ";
+        Integer[] mojoScores = new Integer[files.length -2];
+        if (files != null) {
+            Runtime runtime = Runtime.getRuntime();
+            int i = 0;
+            for (File file : files) {
+                if (!file.getName().equals(name) & !file.getName().equals("output.txt")) {
+                    try {
+                        String comparedClusterPath =  memoryPath + File.separator + file.getName();
+                        Process p = runtime.exec(mojoCommand + mainClusterPath + comparedClusterPath +" -fm", null);
+                        p.waitFor();
+                        InputStream is = p.getInputStream();
+                        int score = is.read();
+                        mojoScores[i] = score;
+                    } catch (IOException e) {
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                    i++;
+                }
+            }
+            System.out.println(Arrays.toString(mojoScores));
+        }
+        for(int score: mojoScores)
+            mojoScore += score;
+
+        return mojoScore/mojoScores.length;
     }
 
 }

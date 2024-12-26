@@ -1,10 +1,6 @@
-package Ui;
-
-import Parser.ImportFinder;
 import Ui.Listener.PathListener;
 
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
 
 public class GuiMain {
 

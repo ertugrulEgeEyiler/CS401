@@ -31,7 +31,6 @@ public class ImportClusterer extends Clustering {
             Map<String, Integer> imports = readImports(inputFile);
             Map<Integer, StringBuilder> clusters = clusterImports(imports);
             writeClusters(clusters, outputFile);
-            System.out.println("Clustering completed. Results written to " + outputFile);
         } catch (IOException e) {
             System.err.println("An error occurred: " + e.getMessage());
             e.printStackTrace();

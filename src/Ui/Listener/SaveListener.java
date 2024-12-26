@@ -1,20 +1,14 @@
 package Ui.Listener;
 
 import Ui.ClusterFrame;
-import Ui.SaveFrame;
-
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
-import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 public class SaveListener implements ActionListener {
     JFrame frame;
@@ -50,9 +44,12 @@ public class SaveListener implements ActionListener {
             if(cluster.equals("Import Analyzer Clusterer")){
                 source += "relationshipOutput.rsf";
             }
+            if(cluster.equals("Matrix Algorithm")){
+                source += "matrixOutput.rsf";
+            }
             Path sourcePath = Paths.get(source);
             try {
-                Files.copy(sourcePath,path,REPLACE_EXISTING);
+                Files.copy(sourcePath,path);
                 JFrame popUp = new JFrame();
                 JLabel label = new JLabel("Succesfully saved to: " + location);
                 popUp.add(label);
@@ -61,17 +58,14 @@ public class SaveListener implements ActionListener {
                 popUp.setBounds(0,0,500,500);
                 popUp.setLocationRelativeTo(null);
                 frame.dispose();
-                ClusterFrame clusterFrame = new ClusterFrame(location);
-
             } catch (IOException ex) {
-                throw new RuntimeException(ex);
+                JOptionPane.showMessageDialog(null, "Save wasn't successful: " + ex.getMessage());
+
             }
 
         }
         if(button.getText().equals("Cancel")){
             frame.dispose();
-            ClusterFrame clusterFrame = new ClusterFrame(location);
-
         }
     }
 }

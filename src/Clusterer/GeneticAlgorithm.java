@@ -119,7 +119,6 @@ public class GeneticAlgorithm extends Clustering {
     public void writeClusters(Map<Integer, StringBuilder> clusters, String outputFile) throws IOException {
         try (FileWriter writer = new FileWriter(outputFile)) {
             for (Map.Entry<Integer, StringBuilder> entry : clusters.entrySet()) {
-                System.out.println(entry.getValue().toString());
                 writer.write(entry.getValue().toString());
             }
         }

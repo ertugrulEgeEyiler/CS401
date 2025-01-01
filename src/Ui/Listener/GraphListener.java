@@ -4,8 +4,14 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class GraphListener implements ActionListener {
 
@@ -57,16 +63,34 @@ public class GraphListener implements ActionListener {
         boolean inCluster = false;
         String previousNode = null;
 
+        Map<String, List<String>> classImports = new HashMap<>();
+
+        try (BufferedReader br = new BufferedReader(new FileReader("src/Memory/output.txt"))) {
+            String currentClass = null;
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                line = line.trim();
+
+                if (line.endsWith("imports:")) {
+                    currentClass = line.replace(" imports:", "").trim();
+                    classImports.put(currentClass, new ArrayList<>());
+                } else if (currentClass != null && !line.isEmpty()) {
+                    classImports.get(currentClass).add(line.trim());
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         for (String line : lines) {
             line = line.trim();
 
             if (line.startsWith("Cluster")) {
-                // Close previous cluster, if any
                 if (inCluster) {
                     sb.append("\t}\n");
                 }
 
-                // Start a new cluster
                 sb.append("\tsubgraph cluster_").append(clusterIndex).append(" {\n");
                 sb.append("\t\tstyle=filled;\n");
                 sb.append("\t\tcolor=lightgrey;\n");
@@ -75,27 +99,33 @@ public class GraphListener implements ActionListener {
 
                 clusterIndex++;
                 inCluster = true;
-                previousNode = null; // Reset the previous node for this cluster
+                previousNode = null;
             } else if (!line.isEmpty()) {
-                // Sanitize and clean up import name
                 String sanitizedNode = line.replaceAll("[^a-zA-Z0-9_]", "_");
-                // Remove any leading underscores
                 sanitizedNode = sanitizedNode.replaceFirst("^_+", "");
 
-                // Add the node to the cluster
                 sb.append("\t\t").append(sanitizedNode).append(";\n");
 
-                // If there's a previous node, connect it to the current node
                 if (previousNode != null) {
                     sb.append("\t\t").append(previousNode).append(" -> ").append(sanitizedNode).append(";\n");
                 }
 
-                // Set the current node as the previous node for the next iteration
                 previousNode = sanitizedNode;
             }
         }
 
-        // Close the last cluster
+        for (Map.Entry<String, List<String>> entry : classImports.entrySet()) {
+            String className = entry.getKey();
+            List<String> imports = entry.getValue();
+
+            String sanitizedClassName = className.replaceAll("[^a-zA-Z0-9_]", "_");
+
+            for (String importClass : imports) {
+                String sanitizedImport = importClass.replaceAll("[^a-zA-Z0-9_]", "_");
+                sb.append("\t").append(sanitizedClassName).append(" -> ").append(sanitizedImport).append(";\n");
+            }
+        }
+
         if (inCluster) {
             sb.append("\t}\n");
         }

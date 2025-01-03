@@ -9,7 +9,6 @@ public class ImportFinder {
     public void createImports(String directory, PrintWriter printWriter){
         try {
             findAndWriteImports(directory, printWriter);
-            System.out.println("Import ifadeleri başarıyla yazıldı.");
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -31,57 +31,63 @@ public class ClusterListener implements ActionListener {
         JButton button = (JButton) e.getSource();
         String filename;
 
-        if (button.getText().equals("Genetic Algorithm")) {
+        if(button.getText().equals("Genetic Algorithm")) {
             filename = "gaAlgorithmCluster.rsf";
-            File file = new File(memoryPath + File.separator + filename);
-            if (!file.isFile()) {
+            File file = new File(memoryPath + File.separator + filename );
+            if(!file.isFile()){
                 generateClusters("gaAlgorithmCluster");
             }
             displayClusterOutput(memoryPath + File.separator + filename, button.getText(), filename);
-        } else if (button.getText().equals("Import Clusterer")) {
-            filename = "clustered.rsf";
-            File file = new File(memoryPath + File.separator + filename);
-            if (!file.isFile()) {
-                generateClusters("clustered");
-            }
+        }
+        else if(button.getText().equals("Import Clusterer")) {
+                filename = "clustered.rsf";
+                File file = new File(memoryPath + File.separator + filename );
+                if(!file.isFile()){
+                    generateClusters("clustered");
+                }
             displayClusterOutput(memoryPath + File.separator + filename, button.getText(), filename);
-        } else if (button.getText().equals("KMode Clusterer")) {
+        }
+        else if(button.getText().equals("KMode Clusterer")) {
             filename = "kModesOutput.rsf";
-            File file = new File(memoryPath + File.separator + filename);
-            if (!file.isFile()) {
+            File file = new File(memoryPath + File.separator + filename );
+            if(!file.isFile()){
                 generateClusters("kModesOutput");
             }
             displayClusterOutput(memoryPath + File.separator + filename, button.getText(), filename);
-        } else if (button.getText().equals("Import Analyzer Clusterer")) {
+        }
+        else if(button.getText().equals("Import Analyzer Clusterer")) {
             filename = "relationshipOutput.rsf";
-            File file = new File(memoryPath + File.separator + filename);
-            if (!file.isFile()) {
+            File file = new File(memoryPath + File.separator + filename );
+            if(!file.isFile()){
                 generateClusters("relationshipOutput");
             }
             displayClusterOutput(memoryPath + File.separator + filename, button.getText(), filename);
-        } else if (button.getText().equals("Matrix Cluster")) {
+        }
+        else if(button.getText().equals("Matrix Cluster")) {
             filename = "matrixOutput.rsf";
             File file = new File(memoryPath + File.separator + filename);
             if (!file.isFile()) {
-                generateClusters("matrixOutput");
+             generateClusters("matrixOutput");
             }
             displayClusterOutput(memoryPath + File.separator + filename, button.getText(), filename);
-        } else if (button.getText().equals("Parser Output")) {
+        }
+        else if(button.getText().equals("Parser Output")){
             try {
                 outputArea.read(new BufferedReader(new FileReader(memoryPath + File.separator + "output.txt")), null);
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog(null, "Failed to display parser output: " + ex.getMessage());
             }
-        } else if (button.getText().equals("Save")) {
+        }
+
+        else if(button.getText().equals("Save")) {
             SaveFrame saveFrame = new SaveFrame();
         }
     }
-
     private void displayClusterOutput(String clusterOutputFile, String name, String outputName) {
         try {
             outputArea.setText("");
             outputArea.append(name + ";" + "\n");
-           // outputArea.append("Mojo Score: " + findMojoScore(outputName) + "\n");
+            outputArea.append("Mojo Score: " + findMojoScore(outputName) + "\n");
 
             // Use TreeMap with a custom comparator to sort keys numerically
             Map<String, List<String>> clusters = new TreeMap<>(Comparator.comparingInt(Integer::parseInt));
@@ -133,7 +139,8 @@ public class ClusterListener implements ActionListener {
                 JOptionPane.showMessageDialog(null, "Failed to generate cluster: " + ex.getMessage());
 
             }
-        } else if (name.equals(("kModesOutput"))) {
+        }
+        else if (name.equals(("kModesOutput"))) {
             KModeClusterer kModesClusterer = new KModeClusterer(5);
             String kModesOutputFile = memoryPath + File.separator + "kModesOutput.rsf";
             try {
@@ -141,13 +148,15 @@ public class ClusterListener implements ActionListener {
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog(null, "Failed to generate cluster: " + ex.getMessage());
             }
-        } else if (name.equals("relationshipOutput")) {
+        }
+        else if (name.equals("relationshipOutput")) {
             String relationshipOutputFile = memoryPath + File.separator + "relationshipOutput.rsf";
             ImportRelationshipAnalyzer analyzer = new ImportRelationshipAnalyzer();
             analyzer.readFile(outputFile);
             analyzer.analyzeAndPrintClusters(relationshipOutputFile);
 
-        } else if (name.equals("matrixOutput")) {
+        }
+        else if (name.equals("matrixOutput")){
             try {
                 String command = System.getProperty("user.dir") + File.separator + "src" + File.separator + "Clusterer" + File.separator + "matrixAlgorithm.exe";
                 String pathname = System.getProperty("user.dir") + File.separator + "src" + File.separator + "Clusterer";
@@ -171,18 +180,19 @@ public class ClusterListener implements ActionListener {
         File directory = new File(memoryPath);
         File[] files = directory.listFiles();
         int mojoScore = 0;
-        if (files.length <= 2) {
+        if(files.length <= 2){
             return mojoScore;
         }
+
         String mojoCommand = "java -jar " + System.getProperty("user.dir") + File.separator + "src" + File.separator + "Test" + File.separator + "mojo.jar ";
-        String mainClusterPath = memoryPath + File.separator + name + " ";
-        Integer[] mojoScores = new Integer[files.length - 2];
+        String mainClusterPath =  memoryPath +  File.separator + name + " ";
+        Integer[] mojoScores = new Integer[files.length -2];
         if (files != null) {
             int i = 0;
             for (File file : files) {
                 if (!file.getName().equals(name) & !file.getName().equals("output.txt")) {
                     try {
-                        String comparedClusterPath = memoryPath + File.separator + file.getName();
+                        String comparedClusterPath =  memoryPath + File.separator + file.getName();
                         String command = mojoCommand + mainClusterPath + comparedClusterPath + " -fm";
                         System.out.println(command);
                         System.out.println(comparedClusterPath);
@@ -200,9 +210,10 @@ public class ClusterListener implements ActionListener {
             }
             System.out.println(Arrays.toString(mojoScores));
         }
-        for (int score : mojoScores)
+        for(int score: mojoScores)
             mojoScore += score;
 
-        return mojoScore / mojoScores.length;
+        return mojoScore/mojoScores.length;
     }
+
 }

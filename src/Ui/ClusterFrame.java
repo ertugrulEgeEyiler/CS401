@@ -1,15 +1,12 @@
 package Ui;
 
-import Clusterer.GeneticAlgorithm;
-import Clusterer.ImportClusterer;
-import Clusterer.ImportRelationshipAnalyzer;
-import Clusterer.KModeClusterer;
 import Ui.Listener.ClusterListener;
 import Ui.Listener.GraphListener;
-import Ui.Listener.SaveListener;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -22,7 +19,6 @@ public class ClusterFrame extends JFrame {
     public ClusterFrame(String path) {
         this.path = path;
         this.memoryPath = System.getProperty("user.dir") + File.separator + "src" + File.separator + "Memory";
-        generateClusters(memoryPath);
         init();
     }
 
@@ -31,13 +27,21 @@ public class ClusterFrame extends JFrame {
         this.setLocationRelativeTo(null);
         this.setLayout(new GridLayout());
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                File dir = new File(memoryPath);
+                for(File file: dir.listFiles()) {
+                    file.delete();
+                }
+            }
+        });
 
         JPanel clusterPanel = new JPanel();
         JPanel buttonPanel = new JPanel();
         JPanel outputPanel = new JPanel();
         JTextArea outputArea = new JTextArea();
-        ClusterListener clusterListener = new ClusterListener(path,this, outputArea);
-        GraphListener graphListener = new GraphListener(outputArea); // Pass the output area
+        ClusterListener clusterListener = new ClusterListener(path, this, outputArea);
+        GraphListener graphListener = new GraphListener(outputArea);
 
         JButton geneticAlgorithmButton = new JButton("Genetic Algorithm");
         clusterPanel.add(geneticAlgorithmButton);
@@ -55,9 +59,13 @@ public class ClusterFrame extends JFrame {
         clusterPanel.add(importAnalyzerButton);
         importAnalyzerButton.addActionListener(clusterListener);
 
-        JButton cluster = new JButton("Ertugrul Cluster");
-        clusterPanel.add(cluster);
-        cluster.addActionListener(clusterListener);
+        JButton matrixButton = new JButton("Matrix Cluster");
+        clusterPanel.add(matrixButton);
+        matrixButton.addActionListener(clusterListener);
+
+        JButton parserButton = new JButton("Parser Output");
+        clusterPanel.add(parserButton);
+        parserButton.addActionListener(clusterListener);
 
         JButton graphButton = new JButton("Show Graph");
         graphButton.addActionListener(graphListener);
@@ -73,9 +81,8 @@ public class ClusterFrame extends JFrame {
             while ((line = reader.readLine()) != null) {
                 outputArea.append(line + "\n");
             }
-        }
-        catch (IOException e) {
-            System.out.println("Error");
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Failed to read parser file: " + e.getMessage());
         }
 
         JScrollPane outputScrollPane = new JScrollPane(outputArea);
@@ -95,33 +102,4 @@ public class ClusterFrame extends JFrame {
         this.setVisible(true);
     }
 
-    private void generateClusters(String memoryPath) {
-        String outputFile = memoryPath + File.separator + "output.txt";
-        GeneticAlgorithm gaClusterer = new GeneticAlgorithm(10, 2, 50, 0.05);
-        String gaAlgorithmClusterFile = memoryPath + File.separator + "gaAlgorithmCluster.rsf";
-        try {
-            gaClusterer.findClusters(outputFile, gaAlgorithmClusterFile);
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
-        ImportClusterer importClusterer = new ImportClusterer();
-        String clusteredFile = memoryPath + File.separator + "clustered.rsf";
-        try{
-            importClusterer.findClusters(outputFile, clusteredFile);
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
-        KModeClusterer kModesClusterer = new KModeClusterer(5);
-        String kModesOutputFile = memoryPath + File.separator + "kModesOutput.rsf";
-        try{
-            kModesClusterer.executeClustering(outputFile, kModesOutputFile);
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
-        String relationshipOutputFile = memoryPath + File.separator + "relationshipOutput.rsf";
-        ImportRelationshipAnalyzer analyzer = new ImportRelationshipAnalyzer();
-        analyzer.readFile(outputFile);
-        analyzer.analyzeAndPrintClusters(relationshipOutputFile);
-
-    }
 }

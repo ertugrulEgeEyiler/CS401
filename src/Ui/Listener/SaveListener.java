@@ -1,20 +1,15 @@
 package Ui.Listener;
 
 import Ui.ClusterFrame;
-import Ui.SaveFrame;
-
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
-import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import java.nio.file.StandardCopyOption;
 
 public class SaveListener implements ActionListener {
     JFrame frame;
@@ -32,27 +27,39 @@ public class SaveListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         JButton button = (JButton) e.getSource();
-        String location = pathInput.getText() + File.separator + "clusterOutput.txt";
-        Path path = Paths.get(location);
 
         if(button.getText().equals("Confirm")){
             String cluster = (String) list.getSelectedValue();
+            String location = pathInput.getText() + File.separator;
             String source = System.getProperty("user.dir") + File.separator + "src" + File.separator + "Memory" + File.separator;
+
             if(cluster.equals("Genetic Algorithm")){
                 source += "gaAlgorithmCluster.rsf";
+                location += "geneticCluster.txt";
             }
-            if(cluster.equals("KMode Clusterer")){
+            else if(cluster.equals("KMode Clusterer")){
                 source += "kModesOutput.rsf";
+                location += "kModeCluster.txt";
             }
-            if(cluster.equals("Import Clusterer")){
+            else if(cluster.equals("Import Clusterer")){
                 source += "clustered.rsf";
+                location += "importCluster.txt";
             }
-            if(cluster.equals("Import Analyzer Clusterer")){
+            else if(cluster.equals("Import Analyzer Clusterer")){
                 source += "relationshipOutput.rsf";
+                location += "importAnalyzerCluster.txt";
+            }
+            else if(cluster.equals("Matrix Algorithm")){
+                source += "matrixOutput.rsf";
+                location += "matrixCluster.txt";
             }
             Path sourcePath = Paths.get(source);
             try {
-                Files.copy(sourcePath,path,REPLACE_EXISTING);
+
+                Path path = Paths.get(location);
+                Files.createDirectories(path.getParent());
+                Files.copy(sourcePath, path, StandardCopyOption.REPLACE_EXISTING);
+
                 JFrame popUp = new JFrame();
                 JLabel label = new JLabel("Succesfully saved to: " + location);
                 popUp.add(label);
@@ -61,17 +68,14 @@ public class SaveListener implements ActionListener {
                 popUp.setBounds(0,0,500,500);
                 popUp.setLocationRelativeTo(null);
                 frame.dispose();
-                ClusterFrame clusterFrame = new ClusterFrame(location);
-
             } catch (IOException ex) {
-                throw new RuntimeException(ex);
+                JOptionPane.showMessageDialog(null, "Save wasn't successful: " + ex.getMessage());
+
             }
 
         }
         if(button.getText().equals("Cancel")){
             frame.dispose();
-            ClusterFrame clusterFrame = new ClusterFrame(location);
-
         }
     }
 }

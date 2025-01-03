@@ -29,6 +29,9 @@ public class PathListener implements ActionListener {
         String path = userInput.getText();
         String outputFile = memoryPath + File.separator + "output.txt";
         System.out.println(path);
+        File directory = new File(memoryPath);
+        directory.mkdirs();
+
         try {
             PrintWriter printWriter = new PrintWriter(outputFile);
             importFinder.createImports(path, printWriter);
@@ -38,6 +41,7 @@ public class PathListener implements ActionListener {
 
         }
         catch (FileNotFoundException e1) {
+            JOptionPane.showMessageDialog(null, "Couldn't find the given path: " + e1.getMessage());
 
         }
 

@@ -24,7 +24,7 @@ public class SaveFrame extends JFrame {
             buttonPanel.setLayout(new FlowLayout());
             buttonPanel.setBounds(0, 0, 900, 50);
 
-        String[] clusters = {"Genetic Algorithm", "Import Clusterer", "KMode Clusterer", "Import Analyzer Clusterer"};
+        String[] clusters = {"Genetic Algorithm", "Import Clusterer", "KMode Clusterer", "Import Analyzer Clusterer","Matrix Algorithm"};
         JList clusterList = new JList(clusters);
         clusterList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane scrollPane = new JScrollPane(clusterList);
@@ -43,7 +43,6 @@ public class SaveFrame extends JFrame {
         JButton cancel = new JButton("Cancel");
         buttonPanel.add(cancel);
 
-        System.out.println(Paths.get(pathInput.getText()));
         SaveListener saveListener = new SaveListener(this,pathInput,clusterList);
         cancel.addActionListener(saveListener);
         confirm.addActionListener(saveListener);

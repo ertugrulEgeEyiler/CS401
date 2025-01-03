@@ -6,6 +6,7 @@
 #include <set>
 #include <string>
 #include <algorithm>
+#include <windows.h>        
 
 #define SPLIT_STRING(str, delim) [&](const std::string& s) { \
     std::vector<std::string> tokens; \
@@ -141,14 +142,38 @@ void write_rsf_file(const map<int, set<string>>& clusters, const string& filenam
     }
 }
 
+    string getWorkingDirectory(){
+        char buf[256];
+        GetCurrentDirectoryA(256, buf); 
+        return std::string(buf) + '\\';
+
+}
+
+   std::string workingdir()
+{
+    char buf[256];
+    GetCurrentDirectoryA(256, buf); 
+    return std::string(buf) + '\\';
+
+}
 // Main function
 int main() {
-    // Input and output file paths
-    string input_txt = "C:\\Users\\kalma\\OneDrive\\Belgeler\\GitHub\\CS401\\src\\Test\\output.txt";
-    string output_rsf = "C:\\Users\\kalma\\OneDrive\\Belgeler\\GitHub\\CS401\\src\\Clusterer\\import_clusters.rsf";
+
+    string workingDirectory = workingdir();
+    string directory = workingDirectory.substr(0, workingDirectory.size()-10);
+    directory += "Memory";
+
+    cout << "Print " +  directory << endl;
+
+    string input = directory + "\\output.txt";
+    string output = directory + "\\matrixOutput.rsf";
+
+        cout << "Print " +  input << endl;
+        cout << "Print " +  output << endl;
+
 
     // Step 1: Read imports from the output.txt file
-    auto imports = read_imports(input_txt);
+    auto imports = read_imports(input);
 
     // Step 2: Create the co-occurrence matrix from the imports
     vector<vector<int>> cooccurrence_matrix;
@@ -159,7 +184,7 @@ int main() {
     auto clusters = perform_clustering(cooccurrence_matrix, import_names);
 
     // Step 4: Write the RSF file with the correct format
-    write_rsf_file(clusters, output_rsf);
+    write_rsf_file(clusters, output);
 
     cout << "Clustering and RSF output written to 'import_clusters.rsf'." << endl;
 
